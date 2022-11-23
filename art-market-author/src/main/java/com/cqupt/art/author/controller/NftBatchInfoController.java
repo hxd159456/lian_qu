@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @CrossOrigin
 @Slf4j
 public class NftBatchInfoController {
+
     @Autowired
     NftBatchInfoService nftBatchInfoService;
     @Autowired
@@ -44,6 +45,7 @@ public class NftBatchInfoController {
      * @param batchInfoEntity
      * @return
      */
+
     @Validated
     @PostMapping("/save")
     public R save(@RequestBody @Valid NftBatchInfoEntity batchInfoEntity) {
@@ -168,5 +170,12 @@ public class NftBatchInfoController {
             return R.ok().put("data", vo);
         }
         return R.error("系统异常！");
+    }
+
+
+    @GetMapping("/getNftName/{id}")
+    public R getNftName(@PathVariable("id") String id) {
+        String name = nftBatchInfoService.getById(id).getName();
+        return R.ok().put("data", name);
     }
 }

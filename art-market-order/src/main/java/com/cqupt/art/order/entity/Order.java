@@ -41,25 +41,25 @@ public class Order implements Serializable {
     /**
      * 交易单号
      */
-    @TableField("orderSn")
+    @TableField("order_sn")
     private String orderSn;
 
     /**
      * 卖方用户ID
      */
-    @TableField("sellUserId")
+    @TableField("sell_user_id")
     private String sellUserId;
 
     /**
      * 买方用户ID
      */
-    @TableField("buyUserId")
+    @TableField("buy_user_id")
     private String buyUserId;
 
     /**
      * 商品ID
      */
-    @TableField("goodsId")
+    @TableField("goods_id")
     private Integer goodsId;
 
     /**
@@ -75,19 +75,19 @@ public class Order implements Serializable {
     /**
      * 总价
      */
-    @TableField("sumPrice")
+    @TableField("sum_price")
     private BigDecimal sumPrice;
 
     /**
      * 实际支付金额
      */
-    @TableField("payMoney")
+    @TableField("pay_money")
     private BigDecimal payMoney;
 
     /**
      * 付款截图
      */
-    @TableField("payPic")
+    @TableField("pay_pic")
     private String payPic;
 
     /**
@@ -98,19 +98,19 @@ public class Order implements Serializable {
     /**
      * 创建时间
      */
-    @TableField("createTime")
+    @TableField("create_time")
     private Date createTime;
 
     /**
      * 付款时间
      */
-    @TableField("payTime")
+    @TableField("pay_time")
     private Date payTime;
 
     /**
      * 收款时间
      */
-    @TableField("endTime")
+    @TableField("end_time")
     private Date endTime;
 
 
