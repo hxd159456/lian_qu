@@ -5,7 +5,7 @@ alipay:
   # 公钥
   alipay_public_key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjaFVHzdYgeVZ28FUpSjmnqquACcQEnToGv0XIxrGjzppQIg9dHcKxXil6/ZIM7PYfhlcLfOkr+RxoEzuKjJnI/Pang/T+aUgAMkkfPSE3Z6x0Iz0ks/HhzsRI9kXrKFv/3o8RUIpgLzHSZ3OD9Y4wry6nmhOu5DBATdvRIG9DzTs/DqVEd5dc3bAnpb6ykUccbiONhnf20wivz4Avw4Z2zMdpxYhjOfukFXivDJuAz6MFZizsgQuBdYT7wu/4brWuC5B5KTS0lcV8PEMlywTBoCEvdhkRPJ5B2dhmC1QYQK/K0SoDGgjtXdteNxu+UBMZMT+bUA4cShLSGTPV+3/yQIDAQAB
   notify_url: http://art-pay.wezoz.com/notify         # 服务器[异步通知]页面路径
-  return_url: http://localhost:8080/#/user             # 同步通知，支付成功，一般跳转到成功页
+  return_url: http://10.17.156.253:8080/#/user             # 同步通知，支付成功，一般跳转到成功页
 
 server:
   port: 9010

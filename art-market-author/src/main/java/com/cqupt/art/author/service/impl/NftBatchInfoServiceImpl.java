@@ -197,10 +197,12 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
             to.setAuthorName(author.getAuthorName());
             to.setAuthorDesc(author.getAuthorDesc());
             to.setAvatarUrl(author.getAvatarUrl());
+
             Date startTime = entity.getIssueTime();
             to.setStartTime(startTime);
             //秒杀时间为30分钟
             to.setEndTime(new Date(startTime.getTime() + 30 * 60 * 1000));
+
             String token = UUID.randomUUID().toString().replace("-", "");
             to.setToken(token);
             String redisJson = JSON.toJSONString(to);

@@ -35,8 +35,8 @@ public class Order implements Serializable {
     /**
      * 主键id
      */
-    @TableId(type = IdType.ID_WORKER)
-    private Integer id;
+    @TableId(type = IdType.ID_WORKER_STR)
+    private String id;
 
     /**
      * 交易单号
@@ -60,7 +60,7 @@ public class Order implements Serializable {
      * 商品ID
      */
     @TableField("goods_id")
-    private Integer goodsId;
+    private String goodsId;
 
     /**
      * 单价

@@ -37,6 +37,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         //卖方id为0为首发订单
         order.setSellUserId("0");
+//        order.setGoodsId(orderTo.getGoodsId());
         order.setNum(1);
         //每次只能买一个
         order.setSumPrice(orderTo.getPrice());

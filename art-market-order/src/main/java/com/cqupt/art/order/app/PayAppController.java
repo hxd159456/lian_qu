@@ -7,14 +7,12 @@ import com.cqupt.art.order.service.OrderService;
 import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/app/pay")
 @Slf4j
+@CrossOrigin
 public class PayAppController {
 
     @Autowired
@@ -23,8 +21,9 @@ public class PayAppController {
     @Autowired
     private AlipayTemplate alipayTemplate;
 
-    @GetMapping("/payOrder/{orderSn}")
+    @GetMapping("/alipay/payOrder/{orderSn}")
     public R payOrder(@PathVariable("orderSn") String orderSn) {
+        log.info("支付宝支付，订单号：{}",orderSn);
         PayVo payVo = orderService.getOrderPay(orderSn);
         try {
             String pay = alipayTemplate.pay(payVo);
