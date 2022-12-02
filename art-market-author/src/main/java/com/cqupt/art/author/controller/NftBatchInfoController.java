@@ -174,8 +174,8 @@ public class NftBatchInfoController {
 
 
     @GetMapping("/getNftName/{id}")
-    public R getNftName(@PathVariable("id") String id) {
-        String name = nftBatchInfoService.getById(id).getName();
-        return R.ok().put("data", name);
+    public R getNftInfo(@PathVariable("id") String id) {
+        NftBatchInfoEntity byId = nftBatchInfoService.getById(id);
+        return R.ok().put("data", byId);
     }
 }

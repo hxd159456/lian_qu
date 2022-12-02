@@ -10,10 +10,10 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 
 @Configuration
 public class SessionConfig {
-    @Bean
-    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
-        return new FastJsonRedisSerializer(Object.class);
-    }
+//    @Bean
+//    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
+//        return new FastJsonRedisSerializer(Object.class);
+//    }
 
     @Bean
     public CookieSerializer cookieSerializer() {

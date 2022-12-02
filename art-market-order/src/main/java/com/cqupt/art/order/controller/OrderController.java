@@ -1,6 +1,8 @@
 package com.cqupt.art.order.controller;
 
 
+import com.cqupt.art.utils.R;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -17,4 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/order")
 public class OrderController {
 
+    @GetMapping("/hello")
+    public R helloFrp(){
+        return R.ok().put("msg","内网穿透成功");
+    }
 }

@@ -1,9 +1,12 @@
 package com.cqupt.art.order.config;
 
+import com.alibaba.fastjson2.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.cqupt.art.order.entity.vo.PayVo;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +47,14 @@ public class AlipayTemplate {
     public String pay(PayVo vo) throws AlipayApiException {
         AlipayClient aliPayClient = new DefaultAlipayClient(gatewayUrl, app_id, merchant_private_key, "json", charset, alipay_public_key, sign_type);
 
-        AlipayTradePagePayRequest payRequest = new AlipayTradePagePayRequest();
+        AlipayTradeWapPayRequest payRequest = new AlipayTradeWapPayRequest();
         payRequest.setReturnUrl(return_url);
         payRequest.setNotifyUrl(notify_url);
+
+        //封装支付请求信息
+        AlipayTradeWapPayModel model=new AlipayTradeWapPayModel();
+        // 销售产品码 必填
+        String product_code="QUICK_WAP_WAY";
         //商户订单号，商户网站订单系统中唯一订单号，必填
         String out_trade_no = vo.getOut_trade_no();
         //付款金额，必填
@@ -55,11 +63,20 @@ public class AlipayTemplate {
         String subject = vo.getSubject();
         //商品描述，可空
         String body = vo.getBody();
+
+//        model.setOutTradeNo(out_trade_no);
+//        model.setSubject(subject);
+//        model.setBody(body);
+//        model.setTotalAmount(total_amount);
+//        model.setProductCode(product_code);
+//        payRequest.setBizModel(model);
         payRequest.setBizContent("{\"out_trade_no\":\"" + out_trade_no + "\","
                 + "\"total_amount\":\"" + total_amount + "\","
                 + "\"subject\":\"" + subject + "\","
                 + "\"body\":\"" + body + "\","
-                + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
+                + "\"product_code\":\"QUICK_WAP_WAY\"}");
+
+        log.info("支付宝请求信息：{}", JSON.toJSONString(payRequest));
         String result = aliPayClient.pageExecute(payRequest).getBody();
 
         log.info("支付宝的响应：{}", result);

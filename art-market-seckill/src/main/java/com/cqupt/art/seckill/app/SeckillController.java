@@ -24,4 +24,5 @@ public class SeckillController {
             return R.error("清稍后重试！");
         }
     }
+
 }

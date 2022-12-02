@@ -1,6 +1,11 @@
-package com.cqupt.art.seckill.config.mq;
+package com.cqupt.art.config.mq;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.ClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +15,8 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 
 @Configuration
-public class RabbitMqConfig {
+public class RabbitConfig {
+
     @Autowired
     RabbitTemplate rabbitTemplate;
 
@@ -23,7 +29,23 @@ public class RabbitMqConfig {
     static class Converter {
         @Bean
         public MessageConverter messageConverter() {
-            return new Jackson2JsonMessageConverter();
+            //发送端和接收端的路径不一样，导致类转化失败，在接收端配置解决（也可在发送端解决）
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+            Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
+//            converter.setClassMapper(new ClassMapper() {
+//                @Override
+//                public void fromClass(Class<?> aClass, MessageProperties messageProperties) {
+//                    //发送端这么写
+////                     messageProperties.setHeader("__TypeId__","com.cqupt.art.order.entity.to.SeckillOrderTo");
+//                }
+//
+//                @Override
+//                public Class<?> toClass(MessageProperties messageProperties) {
+//                    return SeckillOrderTo.class;
+//                }
+//            });
+            return converter;
         }
     }
 

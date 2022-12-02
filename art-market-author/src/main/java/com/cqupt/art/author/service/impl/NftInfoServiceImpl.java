@@ -9,6 +9,7 @@ import com.cqupt.art.author.entity.NftInfoEntity;
 import com.cqupt.art.author.entity.to.TransferLogTo;
 import com.cqupt.art.author.entity.to.UserTo;
 import com.cqupt.art.author.entity.vo.NftAndUserVo;
+import com.cqupt.art.author.entity.vo.TokenVo;
 import com.cqupt.art.author.feign.TradeFeignService;
 import com.cqupt.art.author.feign.UserFeignService;
 import com.cqupt.art.author.service.NftInfoService;
@@ -93,4 +94,5 @@ public class NftInfoServiceImpl extends ServiceImpl<NftInfoDao, NftInfoEntity> i
         });
         return data;
     }
+
 }

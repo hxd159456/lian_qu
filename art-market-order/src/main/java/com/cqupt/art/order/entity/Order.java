@@ -113,5 +113,6 @@ public class Order implements Serializable {
     @TableField("end_time")
     private Date endTime;
 
+    private Integer localId;
 
 }
