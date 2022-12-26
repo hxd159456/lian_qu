@@ -14,14 +14,17 @@ import com.cqupt.art.author.feign.TradeFeignService;
 import com.cqupt.art.author.feign.UserFeignService;
 import com.cqupt.art.author.service.NftInfoService;
 import com.cqupt.art.utils.R;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Service("nftInfoService")
+@Slf4j
 public class NftInfoServiceImpl extends ServiceImpl<NftInfoDao, NftInfoEntity> implements NftInfoService {
 
     @Autowired
@@ -93,6 +96,21 @@ public class NftInfoServiceImpl extends ServiceImpl<NftInfoDao, NftInfoEntity> i
         List<TransferLogTo> data = r.getData("data", new TypeReference<List<TransferLogTo>>() {
         });
         return data;
+    }
+
+    @Override
+    public Integer localId(String artId,String userId) {
+        List<NftInfoEntity> list = this.list(new QueryWrapper<NftInfoEntity>().eq("art_id", artId).eq("user_id", ""));
+        NftInfoEntity one = list.get(new Random().nextInt(list.size()));
+        one.setUserId(userId);
+        log.info("尝试更新UserId=={}",userId);
+        int i = baseMapper.updateUseCas(one);
+        if(i==1){
+            return one.getLocalId();
+        }else{
+            localId(artId,userId);
+        }
+        return null;
     }
 
 }

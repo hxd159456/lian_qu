@@ -35,4 +35,6 @@ public interface NftBatchInfoService extends IService<NftBatchInfoEntity> {
     NftDetailRedisTo secKillDetail(String id, String nftName);
 
     NftDetailVo nftDetail(String id);
+
+    void mintNft(NftBatchInfoEntity batchInfoEntity);
 }

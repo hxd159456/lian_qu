@@ -1,43 +1,43 @@
-package com.cqupt.art.entity;
+package com.cqupt.art.author.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
  * @author huangxudong
- * @since 2022-11-03
+ * @since 2022-11-25
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class PmTransferLog implements Serializable {
+@TableName("pm_user_token")
+public class UserToken implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 用户所拥有的nft映射表
+     */
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
-    private Long nftId;
+    private String userId;
 
-    private String fromAddress;
+    private String artId;
 
-    private String toAddress;
+    private Integer count;
 
-    private String fromPhoneNum;
-
-    private String toPhoneNum;
-
-    private Date createTime;
+    private Integer sail;
 
 
 }

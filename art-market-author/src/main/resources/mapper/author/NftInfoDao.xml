@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cqupt.art.author.dao.NftInfoDao">
+
+    <update id="updateUseCas">
+        update pm_nft_info
+        set
+            user_id = #{one.userId} ,
+            get_way = 1,
+            version = #{one.version}+1
+        where
+            id = #{one.id} and
+              version = #{one.version}
+    </update>
+</mapper>

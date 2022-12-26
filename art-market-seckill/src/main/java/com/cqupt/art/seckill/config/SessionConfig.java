@@ -10,16 +10,17 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 
 @Configuration
 public class SessionConfig {
-//    @Bean
-//    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
-//        return new FastJsonRedisSerializer(Object.class);
-//    }
+    @Bean
+    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
+        return new FastJsonRedisSerializer(Object.class);
+    }
 
     @Bean
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setCookieName("ARTSESSIONID");
-        serializer.setDomainName("10.17.156.253");
+        serializer.setCookieName("JSESSIONID");
+//        serializer.setDomainName("art-meta.top");
+        serializer.setCookiePath("/");
         return serializer;
     }
 }

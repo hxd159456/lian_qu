@@ -16,4 +16,5 @@ public interface NftInfoService extends IService<NftInfoEntity> {
 
     List<TransferLogTo> getTransforLog(Long id);
 
+    Integer localId(String artId,String userId);
 }

@@ -1,11 +1,18 @@
 spring:
   datasource:
     username: root
-    password: root
-    url: jdbc:mysql://10.16.62.2:3306/art?useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai
+    password: Hxd159753@
+    url: jdbc:mysql://124.71.223.148:3306/art?useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai
     dirver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      max-lifetime: 120000
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 124.71.223.148:8848
   redis:
-    host: 10.16.62.2
+    host: 124.71.223.148
     port: 6379
   servlet:
     multipart:
@@ -14,7 +21,7 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   rabbitmq:
-    host: 10.16.62.2
+    host: 124.71.223.148
     port: 5672
     virtual-host: /
     username: guest

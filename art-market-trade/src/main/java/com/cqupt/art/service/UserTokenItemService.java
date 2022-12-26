@@ -16,4 +16,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserTokenItemService extends IService<UserTokenItem> {
 
+    void updateStatus(String artId, String userId, Integer localId,String txHash);
 }

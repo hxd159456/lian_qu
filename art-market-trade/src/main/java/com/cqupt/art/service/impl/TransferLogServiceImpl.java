@@ -1,9 +1,11 @@
 package com.cqupt.art.service.impl;
 
-import com.cqupt.art.entity.PmTransferLog;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cqupt.art.entity.TransferLog;
 import com.cqupt.art.mapper.PmTransferLogMapper;
 import com.cqupt.art.service.TransferLogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -19,13 +21,22 @@ import java.util.Map;
  * @since 2022-11-03
  */
 @Service
-public class TransferLogServiceImpl extends ServiceImpl<PmTransferLogMapper, PmTransferLog> implements TransferLogService {
+@Slf4j
+public class TransferLogServiceImpl extends ServiceImpl<PmTransferLogMapper, TransferLog> implements TransferLogService {
 
     @Override
-    public List<PmTransferLog> getByNftId(Long nftId) {
+    public List<TransferLog> getByNftId(Long nftId) {
         Map<String, Object> map = new HashMap<>();
         map.put("nft_id", nftId);
-        List<PmTransferLog> pmTransferLogs = this.baseMapper.selectByMap(map);
+        List<TransferLog> pmTransferLogs = this.baseMapper.selectByMap(map);
         return pmTransferLogs;
+    }
+
+    @Override
+    public void updateStatus(String nftId, String fromUid, String toUid, Integer localId, String txHash) {
+        log.info("更新状态：txHash==={}",txHash);
+        TransferLog one = this.getOne(new QueryWrapper<TransferLog>().eq("nft_id", nftId).eq("from_uid", fromUid).eq("to_uid", toUid).eq("local_id", localId));
+        one.setTxHash(txHash);
+        this.updateById(one);
     }
 }

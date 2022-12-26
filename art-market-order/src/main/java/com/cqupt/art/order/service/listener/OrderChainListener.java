@@ -12,15 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-@RabbitListener(queues = "nft.order.queue.chain")
-@Service
+//@RabbitListener(queues = "nft.order.queue.chain")
+//@Service
 @Slf4j
 public class OrderChainListener {
 
     @Autowired
     ChainClient chainClient;
 
-    @RabbitHandler
+//    @RabbitHandler
     public void orderChainHandler(ChainTransferTo to, Channel channel, Message message){
         log.info("开始处理链上交易，传入参数为：{}", JSON.toJSONString(to));
         if(to.getFromUserId().equals("0")){

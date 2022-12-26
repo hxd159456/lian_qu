@@ -1,6 +1,12 @@
 package com.cqupt.art.chain.config.mq;
 
+import com.cqupt.art.chain.entity.to.ChainTransferTo;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.ClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +29,21 @@ public class RabbitConfig {
     static class Converter {
         @Bean
         public MessageConverter messageConverter() {
-            return new Jackson2JsonMessageConverter();
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+            Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
+            converter.setClassMapper(new ClassMapper() {
+                @Override
+                public void fromClass(Class<?> aClass, MessageProperties messageProperties) {
+
+                }
+
+                @Override
+                public Class<?> toClass(MessageProperties messageProperties) {
+                    return ChainTransferTo.class;
+                }
+            });
+            return converter;
         }
     }
 

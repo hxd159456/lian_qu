@@ -13,7 +13,6 @@ import org.springframework.web.filter.CorsFilter;
 public class CorsFilterConfig {
     /**
      * 作用顺序的原因，在使用自定义处理器的时候，addCorsMappings会失效，必须添加这个配置
-     *
      * @return
      */
     @Bean

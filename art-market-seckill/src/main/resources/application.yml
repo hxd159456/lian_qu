@@ -5,11 +5,11 @@ spring:
   application:
     name: art-market-seckill
   redis:
-    host: 10.16.62.2
+    host: 124.71.223.148
     port: 6379
 
   rabbitmq:
-    host: 10.16.62.2
+    host: 124.71.223.148
     port: 5672
     virtual-host: /
     username: guest

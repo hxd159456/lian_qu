@@ -16,7 +16,7 @@
              pm_author as a
         where nbi.author_id = a.author_id
           and nbi.is_open = 1
-          and nbi.lanuch_status != 0
+          and nbi.lanuch_status > 1
         order by nbi.issue_time desc
             limit #{start}, #{limit}
     </select>

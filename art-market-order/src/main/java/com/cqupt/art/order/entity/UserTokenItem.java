@@ -3,11 +3,9 @@ package com.cqupt.art.order.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import jnr.ffi.annotations.In;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.web3j.abi.datatypes.Int;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

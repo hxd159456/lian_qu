@@ -45,9 +45,11 @@ public class AlipayTemplate {
     private String gatewayUrl = "https://openapi.alipaydev.com/gateway.do";
 
     public String pay(PayVo vo) throws AlipayApiException {
+        log.info("开始处理支付......");
         AlipayClient aliPayClient = new DefaultAlipayClient(gatewayUrl, app_id, merchant_private_key, "json", charset, alipay_public_key, sign_type);
 
         AlipayTradeWapPayRequest payRequest = new AlipayTradeWapPayRequest();
+
         payRequest.setReturnUrl(return_url);
         payRequest.setNotifyUrl(notify_url);
 
@@ -78,7 +80,6 @@ public class AlipayTemplate {
 
         log.info("支付宝请求信息：{}", JSON.toJSONString(payRequest));
         String result = aliPayClient.pageExecute(payRequest).getBody();
-
         log.info("支付宝的响应：{}", result);
         return result;
     }

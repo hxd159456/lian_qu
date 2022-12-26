@@ -1,20 +1,21 @@
 package com.cqupt.art.author.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cqupt.art.author.entity.NftInfoEntity;
 import com.cqupt.art.author.entity.to.TransferLogTo;
 import com.cqupt.art.author.entity.vo.NftAndUserVo;
 import com.cqupt.art.author.service.NftInfoService;
 import com.cqupt.art.utils.R;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/author/nftInfo")
+@Slf4j
 public class NftInfoController {
     /**
      * 条件查询藏品并分页展示
@@ -56,5 +57,24 @@ public class NftInfoController {
         return R.ok().put("data", transferLogTos);
     }
 
+    @PostMapping("getTokenId")
+    public R getTokenId(@RequestParam String artId,@RequestParam Integer localId){
+        log.info("获取tokenId");
+        NftInfoEntity info = nftInfoService.getOne(new QueryWrapper<NftInfoEntity>().eq("art_id", artId).eq("local_id", localId));
+        if(info!=null){
+            return R.ok().put("tokenId",info.getTokenId());
+        }else{
+            return R.error("不合法的tokenId");
+        }
+    }
 
+    @PostMapping("localId")
+    public R getLocalId(@RequestParam String artId,@RequestParam String userId){
+        log.info("=================获取localId=============");
+        Integer localId = nftInfoService.localId(artId,userId);
+        if(localId == null){
+            log.info("见鬼了，服务写错了！！");
+        }
+        return R.ok().put("data",localId);
+    }
 }

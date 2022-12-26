@@ -36,6 +36,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
+import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +44,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service("nftBatchInfoService")
 @Slf4j
@@ -186,33 +192,46 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     @Override
     public void launch(Long workId) {
         NftBatchInfoEntity entity = baseMapper.selectById(workId);
-        BoundHashOperations<String, Object, Object> ops = redisTemplate.boundHashOps(SeckillConstant.SECKILL_DETAIL_PREFIX);
-        String key = entity.getName() + "-" + entity.getId();
-        if (!ops.hasKey(key)) {
-            AuthorEntity author = authorService.getById(entity.getAuthorId());
-            NftDetailRedisTo to = new NftDetailRedisTo();
+        if(entity.getLanuchStatus()==1){ //秒杀未上架
+            String key = SeckillConstant.SECKILL_DETAIL_PREFIX+":"+entity.getName() + "-" + entity.getId();
+            BoundValueOperations<String, String> ops = redisTemplate.boundValueOps(key);
+            String s = ops.get();
+            if (!StringUtils.isNotBlank(s)) {
+                AuthorEntity author = authorService.getById(entity.getAuthorId());
+                NftDetailRedisTo to = new NftDetailRedisTo();
+                BeanUtils.copyProperties(entity, to);
+                to.setAuthorName(author.getAuthorName());
+                to.setAuthorDesc(author.getAuthorDesc());
+                to.setAvatarUrl(author.getAvatarUrl());
+                Date startTime = entity.getIssueTime();
+                to.setStartTime(startTime);
+                //秒杀时间为30分钟
+                //测试时设置3天过期
+//                to.setEndTime(new Date(startTime.getTime() + 30 * 60 * 1000));
 
-            BeanUtils.copyProperties(entity, to);
+                LocalDateTime start = startTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                LocalDateTime end = start.plus(3, ChronoUnit.DAYS);
+                to.setEndTime(Date.from(end.atZone(ZoneId.systemDefault()).toInstant()));
 
-            to.setAuthorName(author.getAuthorName());
-            to.setAuthorDesc(author.getAuthorDesc());
-            to.setAvatarUrl(author.getAvatarUrl());
+                String token = UUID.randomUUID().toString().replace("-", "");
+                to.setToken(token);
+                String redisJson = JSON.toJSONString(to);
+                ops.set(redisJson,3,TimeUnit.DAYS);
+                //使用信号量设置库存
+                RSemaphore semaphore = redissonClient.getSemaphore(SeckillConstant.SECKILL_SEMAPHORE + token);
+                semaphore.trySetPermits(entity.getInventory());
 
-            Date startTime = entity.getIssueTime();
-            to.setStartTime(startTime);
-            //秒杀时间为30分钟
-            to.setEndTime(new Date(startTime.getTime() + 30 * 60 * 1000));
-
-            String token = UUID.randomUUID().toString().replace("-", "");
-            to.setToken(token);
-            String redisJson = JSON.toJSONString(to);
-            ops.put(key, redisJson);
-            //使用信号量设置库存
-            RSemaphore semaphore = redissonClient.getSemaphore(SeckillConstant.SECKILL_SEMAPHORE + token);
-            semaphore.trySetPermits(entity.getInventory());
+                entity.setLanuchStatus(3);
+                baseMapper.updateById(entity);
+            }else{
+                log.info("redis中已存在！请检查！");
+            }
+        }else{
+            //普通上架
             entity.setLanuchStatus(2);
-            baseMapper.updateById(entity);
+            this.updateById(entity);
         }
+
     }
 
     @Override
@@ -224,14 +243,14 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
 
     @Override
     public NftDetailRedisTo secKillDetail(String id, String nftName) {
-        String key = nftName + "-" + id;
-        String json = (String) redisTemplate.opsForHash().get(SeckillConstant.SECKILL_DETAIL_PREFIX, key);
+        String key = SeckillConstant.SECKILL_DETAIL_PREFIX+":"+nftName + "-" + id;
+//        String json = (String) redisTemplate.opsForHash().get(SeckillConstant.SECKILL_DETAIL_PREFIX, key);
+        String json = redisTemplate.opsForValue().get(key);
         if (StringUtils.isNotBlank(json)) {
             log.info("秒杀商品 redis中查询到的数据：{}", json);
             NftDetailRedisTo to = JSON.parseObject(json, NftDetailRedisTo.class);
             String s = redisTemplate.opsForValue().get(SeckillConstant.SECKILL_SEMAPHORE + to.getToken());
             log.info("库存：{}", s);
-
             //秒杀需要验证token，若未到开始时间，不能把token给出去
             long startTime = to.getStartTime().getTime();
             if (System.currentTimeMillis() < startTime) {
@@ -246,9 +265,21 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     public NftDetailVo nftDetail(String id) {
         NftDetailVo vo = baseMapper.getNftDetail(id);
         long time = vo.getStartTime().getTime();
-        time += 30 * 60 * 1000;
+        //结束时间
+        time += 30 * 60 * 1000 * 48;
         vo.setEndTime(new Date(time));
         return vo;
+    }
+
+    @Override
+    public void mintNft(NftBatchInfoEntity batchInfoEntity) {
+        Integer isOpen = batchInfoEntity.getIsOpen();
+        if(isOpen == 1){
+            batchInfoEntity.setLanuchStatus(1);
+        }else {
+            batchInfoEntity.setLanuchStatus(0);
+        }
+        this.save(batchInfoEntity);
     }
 
 

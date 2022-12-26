@@ -36,8 +36,9 @@ public class SeckillServiceImpl implements SeckillService {
     @Override
     public String kill(SeckillInfoVo info) throws InterruptedException {
         String token = info.getToken();
-        BoundHashOperations<String, String, String> ops = redisTemplate.boundHashOps(SeckillConstant.SECKILL_DETAIL_PREFIX);
-        String jsonString = ops.get(info.getName() + "-" + info.getId());
+//        BoundHashOperations<String, String, String> ops = redisTemplate.boundHashOps(SeckillConstant.SECKILL_DETAIL_PREFIX);
+        String key = SeckillConstant.SECKILL_DETAIL_PREFIX+":"+info.getName() + "-" + info.getId();
+        String jsonString = redisTemplate.opsForValue().get(key);
         if (StringUtils.isNotBlank(jsonString)) {
             NftDetailRedisTo to = JSON.parseObject(jsonString, NftDetailRedisTo.class);
             //验证时间

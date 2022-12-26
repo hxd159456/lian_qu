@@ -8,7 +8,24 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 10.16.62.2:8848
+        server-addr: 124.71.223.148:8848
+  rabbitmq:
+    host: 124.71.223.148
+    port: 5672
+    virtual-host: /
+    username: guest
+    password: guest
+    #开启发送端确认、确认被mq服务器交换机接收
+    publisher-confirms: true
+    #开启发送端消息抵达队列的确认、确认被路由到队列
+    publisher-returns: true
+    #只要抵达队列，以异步方式优先回调returnConfirm
+    template:
+      mandatory: true
+    #手动ack确认收到消息
+    listener:
+      simple:
+        acknowledge-mode: manual
 
 my:
   chain:

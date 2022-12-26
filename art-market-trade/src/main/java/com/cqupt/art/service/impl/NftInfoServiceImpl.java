@@ -2,7 +2,7 @@ package com.cqupt.art.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cqupt.art.entity.PmNftInfo;
-import com.cqupt.art.entity.PmTransferLog;
+import com.cqupt.art.entity.TransferLog;
 import com.cqupt.art.feign.ConfluxChainClient;
 import com.cqupt.art.mapper.NftInfoMapper;
 import com.cqupt.art.service.NftInfoService;
@@ -54,13 +54,8 @@ public class NftInfoServiceImpl extends ServiceImpl<NftInfoMapper, PmNftInfo> im
                 if (StringUtils.isNotBlank(txHash)) {
                     //todo : 此处应该确认链上交易完成,可以考虑增加链上操作完成状态的标志位
                     nftInfo.setUserId(uid);
-                    PmTransferLog log = new PmTransferLog();
-                    log.setFromAddress("adminAddress");
-                    log.setToAddress(toAddress);
-                    log.setFromPhoneNum("");
-                    log.setToPhoneNum("");
-                    log.setCreateTime(new Date());
-                    transferLogService.save(log);
+
+//                    transferLogService.save(log);
                     baseMapper.updateById(nftInfo);
                     return txHash;
                 }

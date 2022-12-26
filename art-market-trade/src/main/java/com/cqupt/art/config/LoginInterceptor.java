@@ -17,13 +17,18 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("请求URI：{}", request.getRequestURI());
         HttpSession session = request.getSession();
-        User loginUser = (User) session.getAttribute("loginUser");
-        log.info("拦截器中的数据：{}", JSON.toJSONString(loginUser));
-        if (loginUser != null) {
-            threadLocal.set(loginUser);
-            return true;
+        log.info("sessionId==>{}",session.getId());
+        Object o = session.getAttribute("loginUser");
+        if(o!=null){
+            User loginUser = JSON.parseObject(o.toString(),User.class);
+            log.info("拦截器中的数据：{}", JSON.toJSONString(loginUser));
+            if (loginUser != null) {
+                threadLocal.set(loginUser);
+                return true;
+            }
         }
-        response.sendRedirect("http://10.17.156.253:8081/#/login");
+        log.info("跳转登录！");
+        response.sendError(401,"用户未登录！");
         return false;
     }
 }

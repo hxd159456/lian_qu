@@ -3,6 +3,7 @@ package com.cqupt.art.seckill.config;
 import com.alibaba.fastjson.JSON;
 import com.cqupt.art.seckill.entity.User;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,14 +17,27 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("请求URI：{}", request.getRequestURI());
+        log.info("request===>{}",request.toString());
         HttpSession session = request.getSession();
-        User loginUser = JSON.parseObject(session.getAttribute("loginUser").toString(), User.class);
-        log.info("拦截器中的数据：{}", JSON.toJSONString(loginUser));
-        if (loginUser != null) {
-            threadLocal.set(loginUser);
-            return true;
+        log.info("sessionId===>{}",session.getId());
+        log.info("session====>{}",JSON.toJSONString(session));
+        Object o = session.getAttribute("loginUser");
+        if(o!=null){
+            User loginUser = JSON.parseObject(o.toString(),User.class);
+            log.info("拦截器中的数据：{}", JSON.toJSONString(loginUser));
+            if (loginUser != null) {
+                threadLocal.set(loginUser);
+                return true;
+            }
         }
-        response.sendRedirect("http://10.17.156.253:8080/#/login");
+//        User loginUser = null;
+//        if(StringUtils.isNotBlank(loginUserJsonString)){
+//             loginUser = JSON.parseObject(loginUserJsonString, User.class);
+//        }
+        log.info("跳转登录！");
+//        response.addHeader("Access-Control-Allow-Origin","*");
+//        response.sendRedirect("http://art-meta.top:9090/#/login");
+        response.sendError(401,"用户未登录！");
         return false;
     }
 }

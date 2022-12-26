@@ -38,6 +38,7 @@ public class RabbitMqConfig {
                 public void fromClass(Class<?> aClass, MessageProperties messageProperties) {
                     //发送端这么写
 //                     messageProperties.setHeader("__TypeId__","com.cqupt.art.order.entity.to.SeckillOrderTo");
+                    messageProperties.setHeader("__TypeId__","com.cqupt.art.chain.entity.to.ChainTransferTo.java");
                 }
 
                 @Override

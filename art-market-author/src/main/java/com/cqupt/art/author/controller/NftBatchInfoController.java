@@ -54,7 +54,8 @@ public class NftBatchInfoController {
         batchInfoEntity.setCreateTime(new Date());
         //初始的库存就是发行总数
         batchInfoEntity.setInventory(batchInfoEntity.getTotalSupply());
-        nftBatchInfoService.save(batchInfoEntity);
+        nftBatchInfoService.mintNft(batchInfoEntity);
+//        nftBatchInfoService.save(batchInfoEntity);
         //todo 这里应该去处理上链的逻辑了
         rabbitTemplate.convertAndSend(MyNftMqConfig.MINT_EXCHANGE, MyNftMqConfig.MINT_PRODUCT_ROUTING_KEY, batchInfoEntity);
         return R.ok().put("data", batchInfoEntity);
@@ -139,7 +140,6 @@ public class NftBatchInfoController {
 
     /**
      * 首发藏品列表
-     *
      * @return
      */
     @GetMapping("listInfo/{curPage}/{limit}")

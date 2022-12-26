@@ -103,4 +103,14 @@ public class UserController {
         userTo.setChainAddress(byId.getChainAddress());
         return R.ok().put("data", userTo);
     }
+
+    @PostMapping("/chainAddress")
+    public R getchainAddress(@RequestParam String userId){
+        User user = userService.getOne(new QueryWrapper<User>().eq("user_id", userId));
+        if(user!=null){
+            return R.ok().put("chainAddress",user.getChainAddress());
+        }else{
+            return R.error("不合法的转入用户！");
+        }
+    }
 }

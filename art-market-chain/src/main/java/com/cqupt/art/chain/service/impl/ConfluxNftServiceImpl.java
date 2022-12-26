@@ -15,6 +15,7 @@ import conflux.web3j.contract.abi.DecodeUtil;
 
 import conflux.web3j.types.Address;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -60,10 +61,8 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
 //        List<Address> addresses = new ArrayList<>();
 //        List<Utf8String> metadataUrls = new ArrayList<>();
         log.info("传入参数：num {},metadata  {},authorName  {}", num, JSON.toJSONString(metadata), authorName);
-        //TODO： uri应为上传metadata的json文件到服务器后的路径
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         BigInteger startTokenId = BigInteger.valueOf(timestamp.getTime());
-
         String jsonString = JSON.toJSONString(metadata);
         if (PingYinUtil.containsChinese(authorName)) {
             authorName = PingYinUtil.toPinyin(authorName);
@@ -103,7 +102,9 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
 //        }));
 //
 //        String data = DefaultFunctionEncoder.encode(adminCreateNFTBatch);
-        String txHash = account.call(new Address(contractAddress), "MyAdminCreateNFTBatch",
+//        account.call(new Account.Option().withGasLimit(new BigInteger("99999999999999")),new Address(contractAddress),)
+        //TODO 燃气费限制，这里每次最坏不要发太多
+        String txHash = account.call(new Account.Option().withGasLimit(15000000),new Address(contractAddress), "MyAdminCreateNFTBatch",
                 account.getAddress().getABIAddress(),
                 uriEncoded,
                 new Uint256(startTokenId),

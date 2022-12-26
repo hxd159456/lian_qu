@@ -1,6 +1,6 @@
 package com.cqupt.art.controller;
 
-import com.cqupt.art.entity.PmTransferLog;
+import com.cqupt.art.entity.TransferLog;
 import com.cqupt.art.service.NftInfoService;
 import com.cqupt.art.service.TransferLogService;
 import com.cqupt.art.service.TransferService;
@@ -58,7 +58,7 @@ public class TransforController {
      */
     @GetMapping("/getTransforLog")
     public R getTransforLog(@RequestParam("nftId") Long nftId) {
-        List<PmTransferLog> transferLogs = transferLogService.getByNftId(nftId);
+        List<TransferLog> transferLogs = transferLogService.getByNftId(nftId);
         return R.ok().put("data", transferLogs);
     }
 }

@@ -3,6 +3,7 @@ package com.cqupt.art.chain.controller;
 import com.cqupt.art.chain.entity.NftMetadata;
 import com.cqupt.art.chain.entity.to.CreateNftBatchInfoTo;
 import com.cqupt.art.chain.entity.to.CreateNftBatchResultTo;
+import com.cqupt.art.chain.entity.to.UserTransferTo;
 import com.cqupt.art.chain.service.ConfluxNftService;
 import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
@@ -94,6 +95,19 @@ public class NftController {
         } catch (Exception e) {
             e.printStackTrace();
             return R.error("链上操作异常，详见链上操作模块日志！");
+        }
+    }
+
+
+    @PostMapping("/userTransfer")
+    public R userTransfer(@RequestBody UserTransferTo to){
+        String txHash = null;
+        try {
+            txHash = confluxNftService.transfer(to.getFromAddress(), to.getToAddress(), BigInteger.valueOf(to.getTokenId()));
+            return R.ok().put("data",txHash);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return R.error().put("msg","链上转移错误！");
         }
     }
 }

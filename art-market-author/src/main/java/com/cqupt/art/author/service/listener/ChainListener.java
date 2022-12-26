@@ -16,6 +16,7 @@ import com.cqupt.art.author.service.NftBatchInfoService;
 import com.cqupt.art.author.service.NftInfoService;
 import com.cqupt.art.utils.R;
 import com.rabbitmq.client.Channel;
+import jnr.ffi.annotations.In;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -69,7 +70,7 @@ public class ChainListener {
             batchInfoEntity.setTokenUri(resultTo.getTokenUri());
             //更新batch的信息
             batchInfoService.update(batchInfoEntity, new QueryWrapper<NftBatchInfoEntity>().eq("author_id", author.getAuthorId()).eq("name", batchInfoEntity.getName()));
-            //把tokenids放到表中
+            //把token_ids放到表中
             NftInfoEntity infoEntity = new NftInfoEntity();
             BeanUtils.copyProperties(batchInfoEntity, infoEntity);
             infoEntity.setArtId(batchInfoEntity.getId().toString());
@@ -77,18 +78,21 @@ public class ChainListener {
             Integer totalSupply = batchInfoEntity.getTotalSupply();
             List<BigInteger> tokenIds = resultTo.getTokenIds();
             List<NftInfoEntity> entiityList = new ArrayList<>();
+            List<Integer> localIdList = new ArrayList<>();
             for (int i = 0; i < tokenIds.size(); i++) {
                 NftInfoEntity entity = new NftInfoEntity();
                 BeanUtils.copyProperties(infoEntity, entity);
                 infoEntity.setTokenId(tokenIds.get(i).longValue());
                 int localId = i + 1;
-                log.info("localId---->{}", String.valueOf(localId));
+                localIdList.add(localId);
+                log.info("localId---->{}", localId);
                 entity.setLocalId(localId);
+                entity.setVersion(0);
                 entiityList.add(entity);
             }
             log.info("插入数据库的数据： {}", JSON.toJSONString(entiityList));
             nftInfoService.saveBatch(entiityList);
-            log.info("插入成功");
+            log.info("插入成功,本地id为：{}",localIdList);
             //上链成功，给消息队列确认
             log.info("上链成功，手动ack消息");
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);

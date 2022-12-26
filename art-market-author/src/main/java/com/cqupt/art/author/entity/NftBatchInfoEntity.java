@@ -54,5 +54,6 @@ public class NftBatchInfoEntity {
     private Integer inventory;
 
     private String tokenUri;
+    // 上架状态
     private Integer lanuchStatus;
 }

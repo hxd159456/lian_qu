@@ -15,7 +15,6 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableFeignClients
 @EnableRabbit
 @EnableRedisHttpSession
-//@MapperScan(basePackages = "com.caupt.art.author.dao")
 public class ArtdevAuthorApplication {
     public static void main(String[] args) {
         SpringApplication.run(ArtdevAuthorApplication.class, args);

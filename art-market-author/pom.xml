@@ -122,6 +122,11 @@
             <artifactId>redisson-spring-boot-starter</artifactId>
             <version>3.15.6</version>
         </dependency>
+        <!--        jedis-->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
     </dependencies>
 
     <!--<build>-->

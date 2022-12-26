@@ -1,6 +1,6 @@
 package com.cqupt.art.service;
 
-import com.cqupt.art.entity.PmTransferLog;
+import com.cqupt.art.entity.TransferLog;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -13,7 +13,9 @@ import java.util.List;
  * @author huangxudong
  * @since 2022-11-03
  */
-public interface TransferLogService extends IService<PmTransferLog> {
+public interface TransferLogService extends IService<TransferLog> {
 
-    List<PmTransferLog> getByNftId(Long nftId);
+    List<TransferLog> getByNftId(Long nftId);
+
+    void updateStatus(String nftId, String fromUid, String toUid, Integer localId, String txHash);
 }

@@ -11,9 +11,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * <p>
- * 
- * </p>
  *
  * @author huangxudong
  * @since 2022-11-25
@@ -30,12 +27,12 @@ public class UserTokenItem implements Serializable {
      * 主键
      */
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
-    private Integer id;
+    private String id;
 
     /**
      * 藏品类型：0、藏品，1、盲盒
      */
-    private Boolean tokenType;
+    private Integer tokenType;
 
     /**
      * 获取类型：1、首发，2、二级购买，3、转增，4、盲盒开出
@@ -60,9 +57,9 @@ public class UserTokenItem implements Serializable {
     /**
      * 藏品状态：1、正常，2、待链上确认，3、寄售中（链上转出确认中）
      */
-    private Boolean status;
+    private Integer status;
 
-    private Integer mapId;
+    private String mapId;
 
 
 }

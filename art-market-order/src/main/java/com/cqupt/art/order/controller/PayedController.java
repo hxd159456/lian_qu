@@ -5,8 +5,10 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.cqupt.art.order.config.AlipayTemplate;
 import com.cqupt.art.order.entity.vo.AlipayAsyncVo;
 import com.cqupt.art.order.service.OrderService;
+import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +26,11 @@ public class PayedController {
     private AlipayTemplate alipayTemplate;
     @Autowired
     private OrderService orderService;
+
+    @GetMapping("test")
+    public R test(){
+        return R.ok();
+    }
 
     //支付宝异步回调，获取支付状态
     @PostMapping("/alipay/notify")

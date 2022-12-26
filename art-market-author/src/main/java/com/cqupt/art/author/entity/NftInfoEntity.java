@@ -40,4 +40,5 @@ public class NftInfoEntity implements Cloneable {
     private Integer state; // 藏品的状态：1持有中2已转赠3转售中4已卖出5开盲盒销毁6合成销毁
 
     private Integer getWay; //获取到该藏品的方式：1购买2赠送3二级市场4盲盒5合成6空投7兑换码
+    private Integer version; //乐观锁
 }
