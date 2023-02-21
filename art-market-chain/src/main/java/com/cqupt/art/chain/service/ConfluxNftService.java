@@ -2,6 +2,7 @@ package com.cqupt.art.chain.service;
 
 import com.cqupt.art.chain.entity.NftMetadata;
 import com.cqupt.art.chain.entity.to.CreateNftBatchResultTo;
+import com.cqupt.art.chain.entity.to.UserTransferTo;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -31,4 +32,6 @@ public interface ConfluxNftService {
     String adminTransfer(String toAddress, BigInteger tokenId);
 
     String adminTransferBatch(List<String> addressList, List<BigInteger> tokenIds);
+
+    String userTransfer(UserTransferTo to) throws Exception;
 }

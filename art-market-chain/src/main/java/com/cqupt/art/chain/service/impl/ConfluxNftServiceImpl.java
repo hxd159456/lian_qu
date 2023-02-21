@@ -4,6 +4,7 @@ package com.cqupt.art.chain.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.cqupt.art.chain.entity.NftMetadata;
 import com.cqupt.art.chain.entity.to.CreateNftBatchResultTo;
+import com.cqupt.art.chain.entity.to.UserTransferTo;
 import com.cqupt.art.chain.service.ConfluxNftService;
 import com.cqupt.art.chain.utils.AliOssUtil;
 import com.cqupt.art.chain.utils.PingYinUtil;
@@ -23,6 +24,7 @@ import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
 
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -47,6 +49,7 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
 
     @Autowired
     private ContractCall contractCall;
+
 
 
     /**
@@ -254,6 +257,26 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public String userTransfer(UserTransferTo to) throws Exception {
+        Account account = Account.create(cfx, to.getPrivateKey());
+        boolean toValid = Address.isValid(to.getToAddress());
+        boolean fromValid = Address.isValid(to.getFromAddress());
+        if (!fromValid) {
+            throw new RuntimeException("from不合法");
+        }
+        if (!toValid) {
+            throw new RuntimeException("to不合法");
+        }
+        String txHash = account.call( new Account.Option().withGasPrice(CfxUnit.DEFAULT_GAS_PRICE),
+                new conflux.web3j.types.Address(contractAddress),
+                "safeTransferFrom",
+                new conflux.web3j.types.Address(to.getFromAddress()).getABIAddress(),
+                new conflux.web3j.types.Address(to.getToAddress()).getABIAddress(),
+                new Uint256(to.getTokenId()));
+        return txHash;
     }
 
 

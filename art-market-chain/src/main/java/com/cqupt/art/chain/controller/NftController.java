@@ -103,7 +103,8 @@ public class NftController {
     public R userTransfer(@RequestBody UserTransferTo to){
         String txHash = null;
         try {
-            txHash = confluxNftService.transfer(to.getFromAddress(), to.getToAddress(), BigInteger.valueOf(to.getTokenId()));
+            txHash = confluxNftService.userTransfer(to);
+            log.info("转赠成功，交易Hash为：{}",txHash);
             return R.ok().put("data",txHash);
         } catch (Exception e) {
             log.info(e.getMessage());

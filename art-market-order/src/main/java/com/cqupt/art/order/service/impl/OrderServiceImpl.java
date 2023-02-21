@@ -1,5 +1,6 @@
 package com.cqupt.art.order.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cqupt.art.order.dao.OrderMapper;
@@ -71,6 +72,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public PayVo getOrderPay(String orderSn) {
         Order order = this.getOne(new QueryWrapper<Order>().eq("order_sn", orderSn));
+        log.info("order==={}", JSON.toJSONString(order));
         PayVo payVo = new PayVo();
         payVo.setOut_trade_no(orderSn);
         BigDecimal amount = order.getSumPrice();

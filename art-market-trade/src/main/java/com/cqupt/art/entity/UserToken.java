@@ -2,6 +2,7 @@ package com.cqupt.art.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,6 +39,9 @@ public class UserToken implements Serializable {
     private Integer count;
 
     private Integer sail;
+
+    @TableLogic
+    private Integer isDelete;
 
 
 }

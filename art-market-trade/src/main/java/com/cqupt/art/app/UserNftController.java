@@ -84,6 +84,7 @@ public class UserNftController {
         return R.ok().put("data",to);
     }
 
+    //TODO 分布式事务
     @PostMapping("userTransfer")
     public R transfer(@RequestBody UserTransferVo transferVo){
         log.info("收到的参数：{}", JSON.toJSONString(transferVo));
@@ -94,16 +95,29 @@ public class UserNftController {
             Long tokenId = r.getData("tokenId", new TypeReference<Long>() {
             });
             log.info("tokenId==={}",tokenId);
+
             UserTransferTo to = new UserTransferTo();
             to.setToAddress(transferVo.getToAddress());
             to.setTokenId(tokenId);
             to.setFromAddress(user.getChainAddress());
+            to.setPrivateKey(user.getPrivateKey());
             R result = confluxChainClient.userTransfer(to);
             if(result.getCode()==200){
+                //链上完成了，应该进行本地系统的处理了
+                //1 逻辑删除本地系统中的对应资产
+                UserToken byId = userTokenService.getById(transferVo.getUserTokenId());
+                if(byId.getCount()-1>0){
+                    byId.setCount(byId.getCount()-1);
+                    userTokenService.updateById(byId);
+                }else{
+                    userTokenService.removeById(byId);
+                }
+
+                userTokenItemService.remove(new QueryWrapper<UserTokenItem>().eq("map_id",transferVo.getUserTokenId()).eq("local_id", transferVo.getLocalId()));
                 String txHash = result.getData("data", new TypeReference<String>() {
                 });
                 log.info("txHash==={}",txHash);
-                //日志
+                //2 记录日志
                 TransferLog transferLog = new TransferLog();
                 transferLog.setNftId(userToken.getArtId());
                 transferLog.setPrice(BigDecimal.ZERO);
@@ -114,6 +128,7 @@ public class UserNftController {
                 //1首发 2 转赠 3 二级 4 空投
                 transferLog.setType(2);
                 transferLogService.save(transferLog);
+                // 3、记录转增订单
                 TransferOrderTo orderTo = new TransferOrderTo();
                 orderTo.setOrderSn(UUID.randomUUID().toString().replace("-",""));
                 orderTo.setBuyUserId(transferVo.getToAddress());//用地址代替id了
@@ -123,7 +138,9 @@ public class UserNftController {
                 orderTo.setPrice(BigDecimal.ZERO);
                 orderTo.setSellUserId(user.getUserId());
                 orderTo.setPayMoney(BigDecimal.ZERO);
+
                 orderTo.setSumPrice(BigDecimal.ZERO);
+                //TODO 此处远程调用会失败 404
                 orderFeignClient.savaTransferOrder(orderTo);
             }else{
                 return R.error("系统异常");
