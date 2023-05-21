@@ -17,7 +17,7 @@ public class MyNftMqConfig {
 
     @Bean(MINT_EXCHANGE)
     public Exchange mintExchange() {
-        return ExchangeBuilder.directExchange(MINT_EXCHANGE).durable(true).build();
+        return ExchangeBuilder.directExchange(MyNftMqConfig.MINT_EXCHANGE).durable(true).build();
     }
 
     @Bean(QUEUE_MINT_PRODUCT)
@@ -25,10 +25,10 @@ public class MyNftMqConfig {
         return new Queue(QUEUE_MINT_PRODUCT, true, false, false);
     }
 
-    @Bean(QUEUE_MINT_CONSUME)
-    public Queue queueMintConsume() {
-        return new Queue(QUEUE_MINT_CONSUME, true, false, false);
-    }
+//    @Bean(QUEUE_MINT_CONSUME)
+//    public Queue queueMintConsume() {
+//        return new Queue(QUEUE_MINT_CONSUME, true, false, false);
+//    }
 
     @Bean
     public Binding mintProductBinding() {
@@ -39,11 +39,11 @@ public class MyNftMqConfig {
         );
     }
 
-    @Bean
-    public Binding mintConsumeBinding() {
-        return new Binding(QUEUE_MINT_CONSUME,
-                Binding.DestinationType.QUEUE,
-                MINT_EXCHANGE,
-                MINT_CONSUME_ROUTING_KEY, null);
-    }
+//    @Bean
+//    public Binding mintConsumeBinding() {
+//        return new Binding(QUEUE_MINT_CONSUME,
+//                Binding.DestinationType.QUEUE,
+//                MINT_EXCHANGE,
+//                MINT_CONSUME_ROUTING_KEY, null);
+//    }
 }

@@ -20,7 +20,7 @@ public class SessionConfig {
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setCookieName("JSESSIONID");
-//        serializer.setDomainName("art-meta.top");
+        serializer.setDomainName("art-meta.top");
         serializer.setCookiePath("/");
         return serializer;
     }

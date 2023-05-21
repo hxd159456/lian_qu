@@ -17,6 +17,7 @@ public class NftDetailRedisTo {
     private String description;
     private String txHash;
     private Float price;
+    private Long stock;
     private String authorDesc;
     private Date startTime;
     private Date endTime;

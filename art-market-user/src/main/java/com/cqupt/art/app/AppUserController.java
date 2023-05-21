@@ -25,7 +25,7 @@ public class AppUserController {
         User user = LoginInterceptor.threadLocal.get();
         log.info("获取用户信息：{}", JSON.toJSONString(user));
         if (user == null) {
-            response.sendRedirect("http://10.17.156.253:8081/#/login");
+            response.sendRedirect("http://art-meta.top:8080/#/login");
             return R.error("请先登录");
         }
         LoginUserVo vo = new LoginUserVo();

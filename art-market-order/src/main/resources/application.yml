@@ -13,7 +13,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://124.71.223.148:3306/art?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/art?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
     password: Hxd159753@
     hikari:
@@ -28,7 +28,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 124.71.223.148:8848
+        server-addr: 192.168.1.6:8848
   rabbitmq:
     host: 124.71.223.148
     port: 5672

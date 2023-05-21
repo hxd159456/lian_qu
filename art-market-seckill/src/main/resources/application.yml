@@ -2,10 +2,12 @@ server:
   port: 9020
 
 spring:
+  session:
+    store-type: redis
   application:
     name: art-market-seckill
   redis:
-    host: 124.71.223.148
+    host: 127.0.0.1
     port: 6379
 
   rabbitmq:
@@ -25,3 +27,20 @@ spring:
     listener:
       simple:
         acknowledge-mode: manual
+
+management:
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: true

@@ -13,7 +13,6 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableRabbit
 @EnableRedisHttpSession
 public class ArtMarketTradeApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(ArtMarketTradeApplication.class, args);
     }

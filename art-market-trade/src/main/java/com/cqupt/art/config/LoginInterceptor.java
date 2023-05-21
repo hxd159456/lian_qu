@@ -17,7 +17,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("请求URI：{}", request.getRequestURI());
         HttpSession session = request.getSession();
-        log.info("sessionId==>{}",session.getId());
+        log.info("sessionId----->{},jsessionId----->{}",session.getId(),request.getHeader("Cookie"));
         Object o = session.getAttribute("loginUser");
         if(o!=null){
             User loginUser = JSON.parseObject(o.toString(),User.class);

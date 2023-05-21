@@ -1,7 +1,9 @@
 package com.cqupt.art.seckill.config;
 
 
+import com.cqupt.art.seckill.intecpter.AccessLimitIntercptor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -11,10 +13,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Slf4j
 public class WebConfig implements WebMvcConfigurer {
 
+    @Bean
+    public AccessLimitIntercptor getAccessLimitIntercptor(){
+        return new AccessLimitIntercptor();
+    }
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginInterceptor())
-                .addPathPatterns("/app/**");
+//        registry.addInterceptor(new LoginInterceptor())
+//                .addPathPatterns("/app/**");
+
+        registry.addInterceptor(getAccessLimitIntercptor())
+                .addPathPatterns("/app/seckill/nft");
     }
 
     //跨域设置

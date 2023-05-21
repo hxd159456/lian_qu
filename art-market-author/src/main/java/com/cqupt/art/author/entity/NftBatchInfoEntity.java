@@ -38,8 +38,8 @@ public class NftBatchInfoEntity {
 
     private String txHash;
     @NotNull
-//    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-//    @JsonFormat(pattern = "yyyy-MM-dd 'T' HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    @JsonFormat(locale = "zh",pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date issueTime;
 
     private Date createTime;

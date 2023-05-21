@@ -32,7 +32,8 @@
                nbi.tx_hash,
                nbi.price,
                nbi.issue_time as "start_time",
-               nbi.total_supply
+               nbi.total_supply,
+               nbi.lanuch_status
         from pm_nft_batch_info as nbi,
              pm_author as a
         where nbi.author_id = a.author_id

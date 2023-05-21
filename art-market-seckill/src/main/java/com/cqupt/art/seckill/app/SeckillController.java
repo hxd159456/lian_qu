@@ -1,5 +1,6 @@
 package com.cqupt.art.seckill.app;
 
+import com.cqupt.art.annotation.AccessLimit;
 import com.cqupt.art.seckill.entity.vo.SeckillInfoVo;
 import com.cqupt.art.seckill.service.SeckillService;
 import com.cqupt.art.utils.R;
@@ -14,7 +15,14 @@ public class SeckillController {
     SeckillService seckillService;
 
 
+    /**
+     * token 可以防止连接泄露，提前写好脚本来秒杀
+     * @param info
+     * @return
+     * @throws InterruptedException
+     */
     @PostMapping("/nft")
+    @AccessLimit(maxTime = 2L)
     public R seckill(@RequestBody SeckillInfoVo info) throws InterruptedException {
         String orderSn = seckillService.kill(info);
 

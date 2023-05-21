@@ -31,12 +31,13 @@ import com.cqupt.art.utils.Query;
 import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundValueOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,7 +48,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -61,10 +61,16 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     @Autowired
     NftInfoService nftInfoService;
     @Autowired
-    StringRedisTemplate redisTemplate;
+    StringRedisTemplate stringRedisTemplate;
 
     @Autowired
+    RedisTemplate<String,Object> redisTemplate;
+    @Autowired
     RedissonClient redissonClient;
+
+    private static String CACHE_PREFIX = "nft:info:";
+
+
 
     @Override
     public NftBatchInfoEntity upToChain(Long id) {
@@ -194,7 +200,7 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
         NftBatchInfoEntity entity = baseMapper.selectById(workId);
         if(entity.getLanuchStatus()==1){ //秒杀未上架
             String key = SeckillConstant.SECKILL_DETAIL_PREFIX+":"+entity.getName() + "-" + entity.getId();
-            BoundValueOperations<String, String> ops = redisTemplate.boundValueOps(key);
+            BoundValueOperations<String, String> ops = stringRedisTemplate.boundValueOps(key);
             String s = ops.get();
             if (!StringUtils.isNotBlank(s)) {
                 AuthorEntity author = authorService.getById(entity.getAuthorId());
@@ -245,11 +251,13 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     public NftDetailRedisTo secKillDetail(String id, String nftName) {
         String key = SeckillConstant.SECKILL_DETAIL_PREFIX+":"+nftName + "-" + id;
 //        String json = (String) redisTemplate.opsForHash().get(SeckillConstant.SECKILL_DETAIL_PREFIX, key);
-        String json = redisTemplate.opsForValue().get(key);
+        String json = stringRedisTemplate.opsForValue().get(key);
         if (StringUtils.isNotBlank(json)) {
             log.info("秒杀商品 redis中查询到的数据：{}", json);
             NftDetailRedisTo to = JSON.parseObject(json, NftDetailRedisTo.class);
-            String s = redisTemplate.opsForValue().get(SeckillConstant.SECKILL_SEMAPHORE + to.getToken());
+            String s = stringRedisTemplate.opsForValue().get(SeckillConstant.SECKILL_SEMAPHORE + to.getToken());
+            assert s != null;
+            to.setStock(Long.parseLong(s));
             log.info("库存：{}", s);
             //秒杀需要验证token，若未到开始时间，不能把token给出去
             long startTime = to.getStartTime().getTime();
@@ -261,13 +269,30 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
         return null;
     }
 
+//    sync：解决缓存击穿
     @Override
+//    @Cacheable(cacheNames = "nft:nftInfo:",key = "#id",sync = true)
     public NftDetailVo nftDetail(String id) {
-        NftDetailVo vo = baseMapper.getNftDetail(id);
-        long time = vo.getStartTime().getTime();
-        //结束时间
-        time += 30 * 60 * 1000 * 48;
-        vo.setEndTime(new Date(time));
+
+        String key = CACHE_PREFIX+id;
+        NftDetailVo vo = null;
+        String cacheJson = stringRedisTemplate.opsForValue().get(key);
+        if(StringUtils.isNotEmpty(cacheJson)){
+            vo = JSON.parseObject(cacheJson,NftDetailVo.class);
+        }else{
+            RLock lock = redissonClient.getLock("cacheLock");
+            try {
+                lock.lock();
+                vo = baseMapper.getNftDetail(id);
+                long time = vo.getStartTime().getTime();
+                //结束时间
+                time += 30 * 60 * 1000 * 48;
+                vo.setEndTime(new Date(time));
+                stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(vo),time,TimeUnit.SECONDS);
+            }finally {
+                lock.unlock();
+            }
+        }
         return vo;
     }
 
