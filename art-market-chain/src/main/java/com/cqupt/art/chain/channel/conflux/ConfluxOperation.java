@@ -1,30 +1,30 @@
-package com.cqupt.art.chain.service.impl;
-
+package com.cqupt.art.chain.channel.conflux;
 
 import com.alibaba.fastjson.JSON;
+import com.cqupt.art.chain.channel.ChainOperation;
+import com.cqupt.art.chain.entity.AccountInfo;
 import com.cqupt.art.chain.entity.NftMetadata;
 import com.cqupt.art.chain.entity.to.CreateNftBatchResultTo;
 import com.cqupt.art.chain.entity.to.UserTransferTo;
-import com.cqupt.art.chain.service.ConfluxNftService;
 import com.cqupt.art.chain.utils.AliOssUtil;
 import com.cqupt.art.chain.utils.PingYinUtil;
 import conflux.web3j.Account;
+import conflux.web3j.AccountManager;
 import conflux.web3j.Cfx;
 import conflux.web3j.CfxUnit;
 import conflux.web3j.contract.ContractCall;
 import conflux.web3j.contract.abi.DecodeUtil;
-
 import conflux.web3j.types.Address;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.web3j.abi.datatypes.*;
+import org.web3j.abi.datatypes.Bool;
+import org.web3j.abi.datatypes.DynamicArray;
+import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Uint256;
 
-
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -35,9 +35,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author hxd
+ * @create 2023-05-21 21:03
+ */
+@Service(value = "conflux")
 @Slf4j
-@Service
-public class ConfluxNftServiceImpl implements ConfluxNftService {
+public class ConfluxOperation implements ChainOperation {
 
     @Value("${my.chain.contract}")
     private String contractAddress;
@@ -51,15 +55,9 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
     @Autowired
     private ContractCall contractCall;
 
+    @Autowired
+    AccountManager accountManager;
 
-
-    /**
-     * @param num
-     * @param metadata
-     * @param authorName
-     * @return
-     * @throws Exception
-     */
     @Override
     public CreateNftBatchResultTo createNftBatch(int num, NftMetadata metadata, String authorName) throws Exception {
 //        List<Address> addresses = new ArrayList<>();
@@ -78,7 +76,7 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
         String fullPath = "E:\\WorkSpace\\chain\\metadata_json\\" + authorName + "\\" + name + ".json";
         log.info(fullPath);
         File file = new File(fullPath);
-        if (!file.getParentFile().exists()) { // 如果父目录不存在，创建父目录
+        if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
         if (file.exists()) {
@@ -280,5 +278,16 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
         return txHash;
     }
 
-
+    @Override
+    public AccountInfo createAccount(String pwd) throws Exception {
+        AccountInfo ai = new AccountInfo();
+        Address address = accountManager.create(pwd);
+        String privateKey = accountManager.exportPrivateKey(address, pwd);
+        //解锁账户
+        accountManager.unlock(address, pwd);
+        ai.setAddress(address.getAddress());
+        ai.setPassword(pwd);
+        ai.setPrivateKey(privateKey);
+        return ai;
+    }
 }

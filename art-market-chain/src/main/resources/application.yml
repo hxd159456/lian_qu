@@ -8,7 +8,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 124.71.223.148:8848
+        server-addr: 192.168.1.6:8848
   rabbitmq:
     host: 124.71.223.148
     port: 5672
@@ -29,9 +29,9 @@ spring:
 
 my:
   chain:
+    channel: com.cqupt.art.chain.channel.conflux.ConcluxOperation
     net:
       url: https://test.confluxrpc.com
-
     contract: cfxtest:acacwaz9gt4jx4cpf4mrbur9usjz2cnp26zgh6d77k
 
     admin:
