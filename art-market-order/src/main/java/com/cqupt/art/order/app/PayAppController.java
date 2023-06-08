@@ -27,10 +27,12 @@ public class PayAppController {
     @Autowired
     private AlipayTemplate alipayTemplate;
 
-    @GetMapping("/alipay/payOrder/{orderSn}")
-    public R payOrder(@PathVariable("orderSn") String orderSn) {
+    @GetMapping("/alipay/payOrder/{name}/{orderSn}/{goodsId}")
+    public R payOrder(@PathVariable("orderSn") String orderSn,
+                      @PathVariable("goodsId") String goodsId,
+                      @PathVariable("name") String name) {
         log.info("支付宝支付，订单号：{}",orderSn);
-        PayVo payVo = orderService.getOrderPay(orderSn);
+        PayVo payVo = orderService.getOrderPay(orderSn,goodsId,name);
         try {
             String pay = alipayTemplate.pay(payVo);
             return R.ok().put("result", pay);

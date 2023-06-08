@@ -138,7 +138,6 @@ public class UserNftController {
                 orderTo.setPrice(BigDecimal.ZERO);
                 orderTo.setSellUserId(user.getUserId());
                 orderTo.setPayMoney(BigDecimal.ZERO);
-
                 orderTo.setSumPrice(BigDecimal.ZERO);
                 //TODO 此处远程调用会失败 404
                 orderFeignClient.savaTransferOrder(orderTo);
@@ -149,6 +148,12 @@ public class UserNftController {
             return R.error("系统异常！");
         }
         return R.ok();
+    }
+
+
+    @PostMapping("sail")
+    public R sail(){
+
     }
 
 }

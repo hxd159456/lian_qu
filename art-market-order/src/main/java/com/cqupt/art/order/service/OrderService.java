@@ -20,7 +20,7 @@ public interface OrderService extends IService<Order> {
 
     void createSeckillOrder(SeckillOrderTo orderTo);
 
-    PayVo getOrderPay(String orderSn);
+    PayVo getOrderPay(String orderSn,String goodsId,String name);
 
     boolean handlerPayResult(AlipayAsyncVo alipayAsyncVo);
 }

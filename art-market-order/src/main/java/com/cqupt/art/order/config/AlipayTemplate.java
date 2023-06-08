@@ -10,8 +10,11 @@ import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.cqupt.art.order.entity.vo.PayVo;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "alipay")
@@ -19,6 +22,9 @@ import org.springframework.stereotype.Component;
 @Data
 @Slf4j
 public class AlipayTemplate {
+
+    @Autowired
+    StringRedisTemplate redisTemplate;
 
     //在支付宝创建的应用的id
     @Value("${alipay.app_id}")
@@ -80,6 +86,7 @@ public class AlipayTemplate {
 
         log.info("支付宝请求信息：{}", JSON.toJSONString(payRequest));
         String result = aliPayClient.pageExecute(payRequest).getBody();
+        redisTemplate.opsForHash().delete(vo.getGoodsId(),vo.getOut_trade_no());
         log.info("支付宝的响应：{}", result);
         return result;
     }

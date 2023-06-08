@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cqupt.art.annotation.Log;
 import com.cqupt.art.config.mq.RegisterMqConfig;
 import com.cqupt.art.entity.User;
 import com.cqupt.art.entity.to.UserLoginTo;
 import com.cqupt.art.entity.vo.UserQueryVo;
 import com.cqupt.art.entity.vo.UserRegisterVo;
+import com.cqupt.art.enu.OperationType;
 import com.cqupt.art.enu.UserStatusEnum;
 import com.cqupt.art.exception.UserException;
 import com.cqupt.art.feign.ChainClient;
@@ -84,14 +86,6 @@ public class UserServiceImpl extends ServiceImpl<PmUserMapper, User> implements 
     }
 
     @Override
-    public List<User> userList(int curPage, int capacity) {
-        Page<User> userPage = new Page<>(curPage, capacity);
-        IPage<User> userIPage = baseMapper.selectPage(userPage, null);
-        List<User> records = userIPage.getRecords();
-        return records;
-    }
-
-    @Override
     public List<User> queryUser(UserQueryVo queryVo) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         if (!StringUtils.isEmpty(queryVo.getUserPhone())) {
@@ -102,6 +96,16 @@ public class UserServiceImpl extends ServiceImpl<PmUserMapper, User> implements 
         }
         List<User> users = baseMapper.selectList(wrapper);
         return users;
+    }
+
+
+    @Override
+    @Log(name = "查询用户列表",type = OperationType.ADMIN)
+    public List<User> userList(int curPage, int capacity) {
+        Page<User> userPage = new Page<>(curPage, capacity);
+        IPage<User> userIPage = baseMapper.selectPage(userPage, null);
+        List<User> records = userIPage.getRecords();
+        return records;
     }
 
     @Override

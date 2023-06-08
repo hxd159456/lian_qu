@@ -22,10 +22,10 @@ public class SeckillController {
      * @throws InterruptedException
      */
     @PostMapping("/nft")
+    //单用户访问频率控制
     @AccessLimit(maxTime = 2L)
     public R seckill(@RequestBody SeckillInfoVo info) throws InterruptedException {
         String orderSn = seckillService.kill(info);
-
         if(orderSn!=null){
             return R.ok().put("orderSn", orderSn);
         }else{

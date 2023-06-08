@@ -3,6 +3,7 @@ package com.cqupt.art.order.service.impl;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cqupt.art.order.dao.OrderMapper;
 import com.cqupt.art.order.entity.Order;
 import com.cqupt.art.order.entity.UserToken;
@@ -16,15 +17,22 @@ import com.cqupt.art.order.entity.vo.PayVo;
 import com.cqupt.art.order.feign.NftWorksClient;
 import com.cqupt.art.order.feign.TradeClient;
 import com.cqupt.art.order.service.OrderService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cqupt.art.order.util.BloomFilterUtil;
 import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 
 /**
@@ -42,23 +50,37 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     RabbitTemplate rabbitTemplate;
 
-//    @Autowired
+    @Autowired
+    StringRedisTemplate redisTemplate;
+
+    @Autowired
+    RedissonClient redissonClient;
+
+    //    @Autowired
 //    UserTokenService userTokenService;
 //    @Autowired
 //    UserTokenItemService itemService;
+    @Resource
+    BloomFilterUtil bloomFilterUtil;
     @Autowired
     TradeClient tradeClient;
+    RBloomFilter<String> bloomFilter = null;
     @Autowired
     private NftWorksClient worksClient;
+
+    @PostConstruct
+    public void init() {
+        bloomFilterUtil.create("orderList", 50000, 0.05);
+    }
+
 
     @Override
     public void createSeckillOrder(SeckillOrderTo orderTo) {
         Order order = new Order();
         BeanUtils.copyProperties(orderTo, order);
-
         //卖方id为0为首发订单
         order.setSellUserId("0");
-//        order.setGoodsId(orderTo.getGoodsId());
+        order.setGoodsId(orderTo.getGoodsId());
         order.setNum(1);
         //每次只能买一个
         order.setSumPrice(orderTo.getPrice());
@@ -67,10 +89,30 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setStatus(1);
         this.save(order);
         //秒杀限制了总量，所以库存是不会出问题的，所以不用先锁库存，支付成功了锁库存就行了
+        //存入缓存，便于查询
+        //使用hash存储订单信息：key为商品id，hash的key为订单号，value为用户id：
+
+        // 布隆过滤器
+        bloomFilter.add(orderTo.getGoodsId() + "-" + orderTo.getOrderSn());
+        redisTemplate.opsForHash().put(orderTo.getGoodsId(), orderTo.getOrderSn(), order);
     }
 
     @Override
-    public PayVo getOrderPay(String orderSn) {
+    public PayVo getOrderPay(String orderSn, String goodsId, String name) {
+        PayVo payVo = null;
+        if (bloomFilter.contains(goodsId + "-" + orderSn)) {
+            payVo = getPayVoByCache(orderSn, goodsId, name);
+            assert payVo != null;
+            payVo.setGoodsId(goodsId);
+        } else {
+            payVo = getPayVoByDB(orderSn, name);
+            payVo.setGoodsId(goodsId);
+        }
+        return payVo;
+    }
+
+    @NotNull
+    private PayVo getPayVoByDB(String orderSn, String name) {
         Order order = this.getOne(new QueryWrapper<Order>().eq("order_sn", orderSn));
         log.info("order==={}", JSON.toJSONString(order));
         PayVo payVo = new PayVo();
@@ -78,18 +120,34 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         BigDecimal amount = order.getSumPrice();
         amount.setScale(2, BigDecimal.ROUND_UP);
         payVo.setTotal_amount(amount.toString());
-        R r = worksClient.getNftInfo(order.getGoodsId().toString());
-        if (r.getCode() == 200) {
-            NftBatchInfoTo info = r.getData("data", new TypeReference<NftBatchInfoTo>() {
-            });
-            payVo.setSubject(info.getName());
-            if ("0".equals(order.getSellUserId())) {
-                payVo.setBody("首发订单-" + info.getName());
-            } else {
-                payVo.setBody("二级订单-" + order.getSellUserId() + "-" + info.getName());
-            }
+        payVo.setSubject(name);
+        if ("0".equals(order.getSellUserId())) {
+            payVo.setBody("首发订单-" + name);
+        } else {
+            payVo.setBody("二级订单-" + order.getSellUserId() + "-" + name);
         }
         return payVo;
+    }
+
+    @Nullable
+    private PayVo getPayVoByCache(String orderSn, String goodsId, String name) {
+        Object orderCache = redisTemplate.opsForHash().get(goodsId, orderSn);
+        if (orderCache != null) {
+            Order order = (Order) orderCache;
+            PayVo payVo = new PayVo();
+            payVo.setOut_trade_no(orderSn);
+            BigDecimal amount = order.getSumPrice();
+            amount.setScale(2, BigDecimal.ROUND_UP);
+            payVo.setTotal_amount(amount.toString());
+            payVo.setSubject(name);
+            if ("0".equals(order.getSellUserId())) {
+                payVo.setBody("首发订单-" + name);
+            } else {
+                payVo.setBody("二级订单-" + order.getSellUserId() + "-" + name);
+            }
+            return payVo;
+        }
+        return null;
     }
 
 
@@ -123,12 +181,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         chainTransferTo.setToUserId(order.getBuyUserId());
         chainTransferTo.setArtId(order.getGoodsId());
         Integer localId = order.getLocalId();
-        if(localId==null){
+        if (localId == null) {
             log.info("订单支付完成，生成本地id");
             R r = worksClient.getLocalId(order.getGoodsId(), order.getBuyUserId());
             localId = r.getData("data", new TypeReference<Integer>() {
             });
-            log.info("生成的本地id为：{}",localId);
+            log.info("生成的本地id为：{}", localId);
         }
         chainTransferTo.setLocalId(localId);
 
@@ -158,7 +216,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         //TODO 考虑到有不限购的藏品，此处也先查后更新
         R result = tradeClient.getUserToken(order.getBuyUserId(), order.getGoodsId());
         UserToken userToken = null;
-        if(result.getCode()==200){
+        if (result.getCode() == 200) {
             userToken = result.getData("data", new TypeReference<UserToken>() {
             });
         }
@@ -169,7 +227,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             userToken.setCount(order.getNum());
             userToken.setSail(0);
             R saveUserTokenResult = tradeClient.saveUserToken(userToken);
-            if(saveUserTokenResult.getCode()==200){
+            if (saveUserTokenResult.getCode() == 200) {
                 //为了拿到id
                 userToken = saveUserTokenResult.getData("data", new TypeReference<UserToken>() {
                 });
