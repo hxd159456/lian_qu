@@ -32,7 +32,7 @@ public class AccountController {
 
     //    @ApiOperation("创建账户，返回账户相关信息，包括密码，私钥，地址，由调用方确定是否放到数据库")
     @GetMapping("/createAccount/{pwd}")
-    public R createAccount(@PathVariable("pwd") String pwd, @RequestParam(value = "type",required = true,defaultValue = "conflux") String type) {
+    public R createAccount(@PathVariable("pwd") String pwd, @RequestParam(value = "type",required = false,defaultValue = "conflux") String type) {
 
         ChainOperation chainOperation = chainChannelContextFactory.getChainOperation(type);
 

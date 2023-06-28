@@ -3,6 +3,7 @@ package com.cqupt.art.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+import com.cqupt.art.annotation.Log;
 import com.cqupt.art.entity.User;
 import com.cqupt.art.entity.to.UserTo;
 import com.cqupt.art.entity.vo.UserQueryVo;
@@ -39,6 +40,7 @@ public class UserController {
 //    }
 
     @GetMapping("/list/{curPage}/{capacity}")
+    @Log(type = "ADMIN",name = "查询用户列表")
     public R userList(@PathVariable("curPage") int curPage, @PathVariable("capacity") int capacity) {
         List<User> users = userService.userList(curPage, capacity);
         return R.ok().put("items", users).put("total", users.size());

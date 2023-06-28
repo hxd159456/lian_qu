@@ -38,18 +38,26 @@ public class AccessLimitIntercptor implements HandlerInterceptor {
             AccessLimit accessLimit = targetMethord.getMethodAnnotation(AccessLimit.class);
             if(!Objects.isNull(accessLimit)){
                 String ip = request.getRemoteAddr();
+
+                //TODO:对ip进行限制
+
                 Object o = request.getSession().getAttribute("loginUser");
                 if(o!=null){
                     User loginUser = JSON.parseObject(o.toString(),User.class);
+
                     String userId = loginUser.getUserId();
+                    //限制访问的前缀+用户id+请求路径
                     String lockKey = ACCESSLIMIT_LOCK_PREFIX+userId+request.getRequestURI();
+                    // 查询是否被限制
                     Object isLock = redisTemplate.opsForValue().get(lockKey);
                     if(Objects.isNull(isLock)){
-                        //未被禁用
+                        //未被限制
                         String countKey = ACCESS_COUNT_PREFIX+userId+request.getRequestURI();
                         Object count = redisTemplate.opsForValue().get(countKey);
+
                         long second = accessLimit.second();
                         long maxTime = accessLimit.maxTime();
+
                         if(Objects.isNull(count)){
                             //首次访问
                             log.info("首次访问");
