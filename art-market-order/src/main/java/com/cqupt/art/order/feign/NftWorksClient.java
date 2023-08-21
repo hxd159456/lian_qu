@@ -13,7 +13,10 @@ public interface NftWorksClient {
 
     @GetMapping("/author/nftBatchInfo/getNftName/{id}")
     R getNftInfo(@PathVariable("id") String id);
+
     @PostMapping("/author/nftInfo/localId")
     R getLocalId(@RequestParam String artId, @RequestParam String userId);
 
+    @GetMapping("/author/nftBatchInfo/updateInventory/{artId}/{localId}/{userId}")
+    public R updateInventory(@PathVariable("artId") Long artId,@PathVariable("localId") Long localId,@PathVariable("userId") String userId);
 }

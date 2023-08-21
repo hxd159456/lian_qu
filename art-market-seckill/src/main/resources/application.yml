@@ -7,7 +7,7 @@ spring:
   application:
     name: art-market-seckill
   redis:
-    host: 127.0.0.1
+    host: 124.71.223.148
     port: 6379
 
   rabbitmq:

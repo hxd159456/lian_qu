@@ -2,6 +2,7 @@ package com.cqupt.art.chain.service.impl;
 
 
 import com.alibaba.fastjson.JSON;
+import com.cqupt.art.chain.entity.AccountInfo;
 import com.cqupt.art.chain.entity.NftMetadata;
 import com.cqupt.art.chain.entity.to.CreateNftBatchResultTo;
 import com.cqupt.art.chain.entity.to.UserTransferTo;
@@ -9,6 +10,7 @@ import com.cqupt.art.chain.service.ConfluxNftService;
 import com.cqupt.art.chain.utils.AliOssUtil;
 import com.cqupt.art.chain.utils.PingYinUtil;
 import conflux.web3j.Account;
+import conflux.web3j.AccountManager;
 import conflux.web3j.Cfx;
 import conflux.web3j.CfxUnit;
 import conflux.web3j.contract.ContractCall;
@@ -50,6 +52,9 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
 
     @Autowired
     private ContractCall contractCall;
+
+    @Autowired
+    private AccountManager accountManager;
 
 
 
@@ -278,6 +283,19 @@ public class ConfluxNftServiceImpl implements ConfluxNftService {
                 new conflux.web3j.types.Address(to.getToAddress()).getABIAddress(),
                 new Uint256(to.getTokenId()));
         return txHash;
+    }
+
+    @Override
+    public AccountInfo createAccount(String pwd) throws Exception {
+        AccountInfo ai = new AccountInfo();
+        Address address = accountManager.create(pwd);
+        String privateKey = accountManager.exportPrivateKey(address, pwd);
+        //解锁账户
+        accountManager.unlock(address, pwd);
+        ai.setAddress(address.getAddress());
+        ai.setPassword(pwd);
+        ai.setPrivateKey(privateKey);
+        return ai;
     }
 
 

@@ -37,4 +37,6 @@ public interface NftBatchInfoService extends IService<NftBatchInfoEntity> {
     NftDetailVo nftDetail(String id);
 
     void mintNft(NftBatchInfoEntity batchInfoEntity);
+
+    void updateInventory(Long artId, Long localId);
 }

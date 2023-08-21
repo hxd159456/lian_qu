@@ -40,6 +40,7 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -67,6 +68,9 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     RedisTemplate<String,Object> redisTemplate;
     @Autowired
     RedissonClient redissonClient;
+
+    @Autowired
+    NftBatchInfoMapper batchInfoMapper;
 
     private static String CACHE_PREFIX = "nft:info:";
 
@@ -305,6 +309,13 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
             batchInfoEntity.setLanuchStatus(0);
         }
         this.save(batchInfoEntity);
+    }
+
+    @Transactional
+    @Override
+    public void updateInventory(Long artId, Long localId) {
+        batchInfoMapper.updateInventory(artId);
+
     }
 
 

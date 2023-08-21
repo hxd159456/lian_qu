@@ -10,12 +10,14 @@ import com.cqupt.art.author.entity.vo.NftDetailVo;
 import com.cqupt.art.author.entity.vo.SnapUpNftInfoVo;
 import com.cqupt.art.author.service.AuthorService;
 import com.cqupt.art.author.service.NftBatchInfoService;
+import com.cqupt.art.author.service.NftInfoService;
 import com.cqupt.art.utils.PageUtils;
 import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,11 +42,12 @@ public class NftBatchInfoController {
     @Autowired
     RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    NftInfoService infoService;
+
     /**
      * 到此处只是后台填写信息后上传到数据库保存信息而没有真正的上架和生成单个的藏品
      *
-     * @param batchInfoEntity
-     * @return
      */
 
     @Validated
@@ -178,5 +181,14 @@ public class NftBatchInfoController {
     public R getNftInfo(@PathVariable("id") String id) {
         NftBatchInfoEntity byId = nftBatchInfoService.getById(id);
         return R.ok().put("data", byId);
+    }
+
+
+    @GetMapping("/updateInventory/{artId}/{localId}/{userId}")
+    @Transactional
+    public R updateInventory(@PathVariable("artId") Long artId,@PathVariable("localId") Long localId,@PathVariable("userId") String userId){
+        nftBatchInfoService.updateInventory(artId,localId);
+        infoService.updateUser(artId,userId,localId);
+        return R.ok();
     }
 }

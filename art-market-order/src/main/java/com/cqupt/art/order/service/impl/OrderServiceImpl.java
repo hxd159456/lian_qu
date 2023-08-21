@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * <p>
@@ -170,16 +171,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             this.updateById(order);
             return true;
         }
+
         return false;
     }
 
-    //TODO 分布式事务
+    //TODO 分布式事务 线程编排
     @Transactional
     void transferToUser(Order order) {
         ChainTransferTo chainTransferTo = new ChainTransferTo();
         chainTransferTo.setFromUserId(order.getSellUserId());
         chainTransferTo.setToUserId(order.getBuyUserId());
         chainTransferTo.setArtId(order.getGoodsId());
+
         Integer localId = order.getLocalId();
         if (localId == null) {
             log.info("订单支付完成，生成本地id");
@@ -249,6 +252,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             logTo.setType(4);
         }
         tradeClient.saveTransferLog(logTo);
+
+        worksClient.updateInventory(nftBatchInfoTo.getId(), Long.valueOf(localId),order.getBuyUserId());
+
         // 链上转帐，远程调用的话会阻塞在这里，影响效率
         rabbitTemplate.convertAndSend("nft-order-event", "nft.order.chain.transfer", chainTransferTo);
     }

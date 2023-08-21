@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cqupt.art.author.entity.NftInfoEntity;
 import com.cqupt.art.author.entity.to.TransferLogTo;
 import com.cqupt.art.author.entity.vo.NftAndUserVo;
-import com.cqupt.art.author.entity.vo.TokenVo;
-import com.cqupt.art.utils.PageUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -17,4 +15,6 @@ public interface NftInfoService extends IService<NftInfoEntity> {
     List<TransferLogTo> getTransforLog(Long id);
 
     Integer localId(String artId,String userId);
+
+    void updateUser(Long artId, String userId, Long localId);
 }

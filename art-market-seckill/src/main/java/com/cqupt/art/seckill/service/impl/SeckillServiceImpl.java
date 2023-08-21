@@ -50,6 +50,7 @@ public class SeckillServiceImpl implements SeckillService {
 
     @Override
     public String kill(SeckillInfoVo info) throws InterruptedException {
+
         //令牌桶限流
         if(!rateLimiter.tryAcquire(1000,TimeUnit.MILLISECONDS)){
             log.info("用户【{}】被限流！",LoginInterceptor.threadLocal.get().getUserId());
@@ -81,10 +82,10 @@ public class SeckillServiceImpl implements SeckillService {
                     User user = LoginInterceptor.threadLocal.get();
                     long ttl = to.getEndTime().getTime() - System.currentTimeMillis();
                     //TODO：测试阶段先不限制购买次数
-                    Boolean occupy = redisTemplate.opsForValue().setIfAbsent(SeckillConstant.USER_BOUGHT_FLAG + user.getUserId() + "-" + to.getId(), "1", ttl, TimeUnit.MILLISECONDS);
+                    Boolean occupy = redisTemplate.opsForValue()
+                            .setIfAbsent(SeckillConstant.USER_BOUGHT_FLAG + user.getUserId() + "-" + to.getId(), "1", ttl, TimeUnit.MILLISECONDS);
                     if (occupy) {
                         //当前用户没买过
-
                         // semphore防止超卖
                         RSemaphore semaphore = redissonClient.getSemaphore(SeckillConstant.SECKILL_SEMAPHORE + to.getToken());
                         boolean acquire = semaphore.tryAcquire(1, 100, TimeUnit.MILLISECONDS);

@@ -113,4 +113,11 @@ public class NftInfoServiceImpl extends ServiceImpl<NftInfoDao, NftInfoEntity> i
         return null;
     }
 
+    @Override
+    public void updateUser(Long artId, String userId, Long localId) {
+        NftInfoEntity one = this.getOne(new QueryWrapper<NftInfoEntity>().eq("local_id", localId).eq("art_id", artId));
+        one.setUserId(userId);
+        this.updateById(one);
+    }
+
 }

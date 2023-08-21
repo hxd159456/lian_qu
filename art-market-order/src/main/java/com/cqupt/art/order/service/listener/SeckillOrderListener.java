@@ -5,6 +5,7 @@ import com.cqupt.art.order.entity.to.SeckillOrderTo;
 import com.cqupt.art.constant.SeckillOrderMqConstant;
 import com.cqupt.art.order.service.OrderService;
 import com.rabbitmq.client.Channel;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -23,6 +24,7 @@ public class SeckillOrderListener {
     OrderService orderService;
 
     @RabbitHandler
+    @SneakyThrows
     public void createOrder(SeckillOrderTo orderTo, Message message, Channel channel) {
         log.info("收到秒杀消息：{}", JSON.toJSONString(orderTo));
         long tag = message.getMessageProperties().getDeliveryTag();
@@ -30,7 +32,8 @@ public class SeckillOrderListener {
             orderService.createSeckillOrder(orderTo);
             channel.basicAck(tag, false);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("创建订单失败：{}. \n异常：{}",orderTo.toString(),e.getMessage());
+            channel.basicReject(tag,true);
         }
     }
 
