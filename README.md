@@ -1,7 +1,7 @@
 # 趣链
 
 #### 介绍
-链趣是一个基于java和区块链技术的数字藏品铸造、发行、管理交易平台。后台使用技术栈：SpringBoot + SpringCloud + MySql + Redis + RabbitMq.
+趣链是一个基于java和区块链技术的数字藏品铸造、发行、管理交易平台。后台使用技术栈：SpringBoot + SpringCloud + MySql + Redis + RabbitMq.
 
 区块链模块使用桥接模式、策略模式以及工厂模式实现完全依赖于抽象，完全与业务代码解耦，可以快速接入其他链以及当前系统换链。
 
