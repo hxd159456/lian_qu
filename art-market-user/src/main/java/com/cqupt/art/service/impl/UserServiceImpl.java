@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cqupt.art.annotation.Log;
 import com.cqupt.art.config.mq.RegisterMqConfig;
+import com.cqupt.art.constant.CacheConst;
 import com.cqupt.art.entity.User;
 import com.cqupt.art.entity.to.UserLoginTo;
 import com.cqupt.art.entity.vo.UserQueryVo;
@@ -32,7 +33,6 @@ import java.util.List;
  * <p>
  * 用户表 服务实现类
  * </p>
- *
  * @author huangxudong
  * @since 2022-11-03
  */

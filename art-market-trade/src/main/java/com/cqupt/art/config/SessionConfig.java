@@ -8,7 +8,7 @@ import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
 
-@Configuration
+@Configuration("mySessionConfig")
 public class SessionConfig {
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {

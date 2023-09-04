@@ -24,4 +24,6 @@ public interface NftBatchInfoMapper extends BaseMapper<NftBatchInfoEntity> {
     NftDetailVo getNftDetail(@Param("id") String id);
 
     void updateInventory(@Param("id") Long artId);
+
+    NftBatchInfoEntity selectByIdLock(@Param("workId") Long workId);
 }

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/app/pay")
+@RequestMapping("/pay")
 @Slf4j
 @CrossOrigin
 public class PayAppController {

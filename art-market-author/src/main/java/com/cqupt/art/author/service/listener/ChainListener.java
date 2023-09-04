@@ -16,7 +16,6 @@ import com.cqupt.art.author.service.NftBatchInfoService;
 import com.cqupt.art.author.service.NftInfoService;
 import com.cqupt.art.utils.R;
 import com.rabbitmq.client.Channel;
-import jnr.ffi.annotations.In;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -47,6 +46,8 @@ public class ChainListener {
     @Autowired
     NftInfoService nftInfoService;
 
+
+    // 发行藏品，上链
     @SneakyThrows
     @RabbitHandler
     public void upToChain(NftBatchInfoEntity batchInfoEntity, Channel channel, Message message) {

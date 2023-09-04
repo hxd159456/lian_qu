@@ -16,7 +16,6 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/app/user")
 @Slf4j
 public class AppUserController {
 

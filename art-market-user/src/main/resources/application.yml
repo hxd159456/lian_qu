@@ -7,20 +7,20 @@ spring:
     name: art-user-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://124.71.223.148:3306/art?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.16.19.243:3306/art_dev?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
-    password: Hxd159753@
+    password: Ye500235!
     hikari:
       max-lifetime: 120000
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.1.6:8848
+        server-addr: 10.16.19.243:8848
   session:
     store-type: redis
 
   rabbitmq:
-    host: 124.71.223.148
+    host: 10.16.19.243
     port: 5672
     virtual-host: /
     username: guest
@@ -30,7 +30,7 @@ spring:
         acknowledge-mode: manual
 
   redis:
-    host: 124.71.223.148
+    host: 10.16.19.243
 
 ribbon:
   MaxAutoRetries: 0

@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cqupt.art.author.dao.NftInfoDao;
+import com.cqupt.art.author.entity.NftBatchInfoEntity;
 import com.cqupt.art.author.entity.NftInfoEntity;
 import com.cqupt.art.author.entity.to.TransferLogTo;
 import com.cqupt.art.author.entity.to.UserTo;
@@ -12,16 +13,20 @@ import com.cqupt.art.author.entity.vo.NftAndUserVo;
 import com.cqupt.art.author.entity.vo.TokenVo;
 import com.cqupt.art.author.feign.TradeFeignService;
 import com.cqupt.art.author.feign.UserFeignService;
+import com.cqupt.art.author.service.NftBatchInfoService;
 import com.cqupt.art.author.service.NftInfoService;
 import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service("nftInfoService")
 @Slf4j
@@ -32,6 +37,15 @@ public class NftInfoServiceImpl extends ServiceImpl<NftInfoDao, NftInfoEntity> i
 
     @Autowired
     TradeFeignService tradeFeignService;
+
+    @Autowired
+    StringRedisTemplate redisTemplate;
+
+    @Autowired
+    NftBatchInfoService batchInfoService;
+
+    @Autowired
+    RedissonClient redissonClient;
 
     @Override
     public List<NftAndUserVo> queryPage(Map<String, Object> params) {
@@ -100,24 +114,38 @@ public class NftInfoServiceImpl extends ServiceImpl<NftInfoDao, NftInfoEntity> i
 
     @Override
     public Integer localId(String artId,String userId) {
-        List<NftInfoEntity> list = this.list(new QueryWrapper<NftInfoEntity>().eq("art_id", artId).eq("user_id", ""));
-        NftInfoEntity one = list.get(new Random().nextInt(list.size()));
-        one.setUserId(userId);
-        log.info("尝试更新UserId=={}",userId);
-        int i = baseMapper.updateUseCas(one);
-        if(i==1){
-            return one.getLocalId();
-        }else{
-            localId(artId,userId);
+        String key = "nft:token:bit:local:" + artId;
+        Boolean hasKey = redisTemplate.hasKey(key);;
+        if(Boolean.FALSE.equals(hasKey)){
+            NftBatchInfoEntity byId = batchInfoService.getById(artId);
+            redisTemplate.opsForValue().setBit("nft:token:bit:local"+artId,byId.getInventory(),false);
         }
-        return null;
+        RLock lock = redissonClient.getLock(key + ":lock");
+        try {
+            boolean locked = false;
+            Long index = -1L;
+            do{
+                locked = lock.tryLock(1000, TimeUnit.MILLISECONDS);
+                index = redisTemplate.execute(new DefaultRedisScript<>("return redis.call('bitpos', KEYS[1], ARGV[1])", Long.class),
+                        Arrays.asList(key), "0");
+                redisTemplate.opsForValue().setBit(key,index,true);
+            }while (!locked);
+            return index.intValue();
+        }catch (Exception e){
+            log.info("分配LocalId失败！{}",e.getMessage());
+            return null;
+        }finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public void updateUser(Long artId, String userId, Long localId) {
-        NftInfoEntity one = this.getOne(new QueryWrapper<NftInfoEntity>().eq("local_id", localId).eq("art_id", artId));
-        one.setUserId(userId);
-        this.updateById(one);
+//        NftInfoEntity one = this.getOne(new QueryWrapper<NftInfoEntity>()
+//                .eq("local_id", localId)
+//                .eq("art_id", artId));
+//        one.setUserId(userId);
+//        this.updateById(one);
     }
 
 }

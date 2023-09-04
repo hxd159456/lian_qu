@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/order/pay/payed")
+@RequestMapping("/pay/payed")
 @Slf4j
 public class PayedController {
     @Autowired
@@ -32,7 +32,7 @@ public class PayedController {
         return R.ok();
     }
 
-    //支付宝异步回调，获取支付状态
+    // 支付宝异步回调，获取支付状态
     @PostMapping("/alipay/notify")
     public String handlerAlipay(HttpServletRequest request, AlipayAsyncVo alipayAsyncVo) throws AlipayApiException, UnsupportedEncodingException {
         log.info("收到支付宝异步通知，订单号为：{}，支付宝订单号为：{}",alipayAsyncVo.getOut_trade_no(),alipayAsyncVo.getTrade_no());

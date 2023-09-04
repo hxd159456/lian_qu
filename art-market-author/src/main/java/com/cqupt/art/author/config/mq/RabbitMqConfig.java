@@ -30,14 +30,15 @@ public class RabbitMqConfig {
         }
     }
 
+    // https://blog.csdn.net/yaomingyang/article/details/108410286
     /**
      * 定制RabbitTemplate
      * 1、服务收到消息就会回调
      * 1、spring.rabbitmq.publisher-confirms: true
      * 2、设置确认回调
      * 2、消息正确抵达队列就会进行回调
-     * 1、spring.rabbitmq.publisher-returns: true
-     * spring.rabbitmq.template.mandatory: true
+     * 1、   spring.rabbitmq.publisher-returns: true
+     *      spring.rabbitmq.template.mandatory: true
      * 2、设置确认回调ReturnCallback
      * <p>
      * 3、消费端确认(保证每个消息都被正确消费，此时才可以在队列删除这个消息)

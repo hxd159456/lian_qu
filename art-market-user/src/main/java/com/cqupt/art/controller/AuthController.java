@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @Slf4j
-@RequestMapping("/auth")
+@RequestMapping("auth")
 public class AuthController {
     @Autowired
     UserService userService;

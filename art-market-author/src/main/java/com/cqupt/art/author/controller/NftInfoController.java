@@ -14,14 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/author/nftInfo")
+@RequestMapping("author/nftInfo")
 @Slf4j
 public class NftInfoController {
     /**
      * 条件查询藏品并分页展示
-     *
-     * @param params
-     * @return
      */
 
     @Autowired

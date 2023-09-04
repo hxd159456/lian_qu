@@ -1,6 +1,5 @@
 package com.cqupt.art.seckill.entity.vo;
 
-import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;

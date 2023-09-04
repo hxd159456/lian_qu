@@ -38,9 +38,7 @@ public class AccessLimitIntercptor implements HandlerInterceptor {
             AccessLimit accessLimit = targetMethord.getMethodAnnotation(AccessLimit.class);
             if(!Objects.isNull(accessLimit)){
                 String ip = request.getRemoteAddr();
-
                 //TODO:对ip进行限制
-
                 Object o = request.getSession().getAttribute("loginUser");
                 if(o!=null){
                     User loginUser = JSON.parseObject(o.toString(),User.class);

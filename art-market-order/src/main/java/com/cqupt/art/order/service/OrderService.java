@@ -23,4 +23,8 @@ public interface OrderService extends IService<Order> {
     PayVo getOrderPay(String orderSn,String goodsId,String name);
 
     boolean handlerPayResult(AlipayAsyncVo alipayAsyncVo);
+
+    void releaseOrder(String msg);
+
+    void transferByMQ(String orderSn);
 }

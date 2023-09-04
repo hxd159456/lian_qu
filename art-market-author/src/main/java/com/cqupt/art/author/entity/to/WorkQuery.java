@@ -1,6 +1,5 @@
 package com.cqupt.art.author.entity.to;
 
-import jnr.ffi.annotations.In;
 import lombok.Data;
 
 @Data

@@ -15,6 +15,17 @@ public class R extends HashMap<String, Object> {
     private R() {
     }
 
+    public static R userNotLogin(){
+        return error(300,"请登录！");
+    }
+    public static R userLoginFail(){
+        return error(301,"请检查用户名或密码！");
+    }
+
+    public static R hasNoPermission(){
+        return error(302,"无权限！");
+    }
+
     public static R error() {
         return error(500, "未知异常，请联系管理员");
     }

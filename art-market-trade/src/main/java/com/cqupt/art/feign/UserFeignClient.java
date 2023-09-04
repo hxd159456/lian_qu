@@ -9,4 +9,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UserFeignClient {
     @GetMapping("/api/user/getUserByPhone/{phone}")
     R getUserByPhone(@PathVariable("phone") String phone);
+
 }

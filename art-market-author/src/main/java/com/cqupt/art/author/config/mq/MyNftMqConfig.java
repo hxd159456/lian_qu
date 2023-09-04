@@ -9,11 +9,9 @@ import java.io.StringReader;
 
 @Configuration
 public class MyNftMqConfig {
-    public static final String QUEUE_MINT_PRODUCT = "queue_mint_nft_product";
-    public static final String QUEUE_MINT_CONSUME = "queue_mint_nft_consume";
-    public static final String MINT_EXCHANGE = "mint_nft_exchange";
+    public static final String QUEUE_MINT_PRODUCT = "queue.mint.nft.product";
+    public static final String MINT_EXCHANGE = "mint.nft.exchange";
     public static final String MINT_PRODUCT_ROUTING_KEY = "chain.mint.product.queue";
-    public static final String MINT_CONSUME_ROUTING_KEY = "chain.mint.product.queue";
 
     @Bean(MINT_EXCHANGE)
     public Exchange mintExchange() {
@@ -25,10 +23,6 @@ public class MyNftMqConfig {
         return new Queue(QUEUE_MINT_PRODUCT, true, false, false);
     }
 
-//    @Bean(QUEUE_MINT_CONSUME)
-//    public Queue queueMintConsume() {
-//        return new Queue(QUEUE_MINT_CONSUME, true, false, false);
-//    }
 
     @Bean
     public Binding mintProductBinding() {
@@ -38,12 +32,4 @@ public class MyNftMqConfig {
                 MINT_PRODUCT_ROUTING_KEY, null
         );
     }
-
-//    @Bean
-//    public Binding mintConsumeBinding() {
-//        return new Binding(QUEUE_MINT_CONSUME,
-//                Binding.DestinationType.QUEUE,
-//                MINT_EXCHANGE,
-//                MINT_CONSUME_ROUTING_KEY, null);
-//    }
 }

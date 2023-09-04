@@ -10,4 +10,5 @@ public class SeckillOrderTo {
     private String buyUserId;
     private String goodsId;
     private BigDecimal price;
+    private String token;
 }

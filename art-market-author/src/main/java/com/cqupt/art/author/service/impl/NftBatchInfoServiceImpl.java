@@ -65,7 +65,7 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    RedisTemplate<String,Object> redisTemplate;
+    RedisTemplate<String, Object> redisTemplate;
     @Autowired
     RedissonClient redissonClient;
 
@@ -73,7 +73,6 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     NftBatchInfoMapper batchInfoMapper;
 
     private static String CACHE_PREFIX = "nft:info:";
-
 
 
     @Override
@@ -148,9 +147,10 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
 
     @Override
     public void updateDes(NftBatchInfoEntity nftBatchInfo) {
-        //更新批量这个表
+        // 更新批量这个表
         this.updateById(nftBatchInfo);
-        //更新藏品的单个表
+        // TODO：删除缓存
+        // 更新藏品的单个表
         UpdateWrapper<NftInfoEntity> up = new UpdateWrapper<>();
         up.set("description", nftBatchInfo.getDescription());
         up.eq("art_id", nftBatchInfo.getId() + "");
@@ -201,9 +201,10 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
 
     @Override
     public void launch(Long workId) {
-        NftBatchInfoEntity entity = baseMapper.selectById(workId);
-        if(entity.getLanuchStatus()==1){ //秒杀未上架
-            String key = SeckillConstant.SECKILL_DETAIL_PREFIX+":"+entity.getName() + "-" + entity.getId();
+        NftBatchInfoEntity entity = batchInfoMapper.selectByIdLock(workId);
+//         = baseMapper.selectById(workId);
+        if (entity.getLanuchStatus() == 1) { //秒杀未上架
+            String key = SeckillConstant.SECKILL_DETAIL_PREFIX + ":" + entity.getName() + "-" + entity.getId();
             BoundValueOperations<String, String> ops = stringRedisTemplate.boundValueOps(key);
             String s = ops.get();
             if (!StringUtils.isNotBlank(s)) {
@@ -218,7 +219,6 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
                 //秒杀时间为30分钟
                 //测试时设置3天过期
 //                to.setEndTime(new Date(startTime.getTime() + 30 * 60 * 1000));
-
                 LocalDateTime start = startTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
                 LocalDateTime end = start.plus(3, ChronoUnit.DAYS);
                 to.setEndTime(Date.from(end.atZone(ZoneId.systemDefault()).toInstant()));
@@ -226,17 +226,17 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
                 String token = UUID.randomUUID().toString().replace("-", "");
                 to.setToken(token);
                 String redisJson = JSON.toJSONString(to);
-                ops.set(redisJson,3,TimeUnit.DAYS);
+                ops.set(redisJson, 3, TimeUnit.DAYS);
                 //使用信号量设置库存
                 RSemaphore semaphore = redissonClient.getSemaphore(SeckillConstant.SECKILL_SEMAPHORE + token);
                 semaphore.trySetPermits(entity.getInventory());
 
                 entity.setLanuchStatus(3);
                 baseMapper.updateById(entity);
-            }else{
+            } else {
                 log.info("redis中已存在！请检查！");
             }
-        }else{
+        } else {
             //普通上架
             entity.setLanuchStatus(2);
             this.updateById(entity);
@@ -253,7 +253,7 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
 
     @Override
     public NftDetailRedisTo secKillDetail(String id, String nftName) {
-        String key = SeckillConstant.SECKILL_DETAIL_PREFIX+":"+nftName + "-" + id;
+        String key = SeckillConstant.SECKILL_DETAIL_PREFIX + ":" + nftName + "-" + id;
 //        String json = (String) redisTemplate.opsForHash().get(SeckillConstant.SECKILL_DETAIL_PREFIX, key);
         String json = stringRedisTemplate.opsForValue().get(key);
         if (StringUtils.isNotBlank(json)) {
@@ -273,17 +273,17 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
         return null;
     }
 
-//    sync：解决缓存击穿
+    //    sync：解决缓存击穿
     @Override
 //    @Cacheable(cacheNames = "nft:nftInfo:",key = "#id",sync = true)
     public NftDetailVo nftDetail(String id) {
 
-        String key = CACHE_PREFIX+id;
+        String key = CACHE_PREFIX + id;
         NftDetailVo vo = null;
         String cacheJson = stringRedisTemplate.opsForValue().get(key);
-        if(StringUtils.isNotEmpty(cacheJson)){
-            vo = JSON.parseObject(cacheJson,NftDetailVo.class);
-        }else{
+        if (StringUtils.isNotEmpty(cacheJson)) {
+            vo = JSON.parseObject(cacheJson, NftDetailVo.class);
+        } else {
             RLock lock = redissonClient.getLock("cacheLock");
             try {
                 lock.lock();
@@ -292,8 +292,8 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
                 //结束时间
                 time += 30 * 60 * 1000 * 48;
                 vo.setEndTime(new Date(time));
-                stringRedisTemplate.opsForValue().set(key,JSON.toJSONString(vo),time,TimeUnit.SECONDS);
-            }finally {
+                stringRedisTemplate.opsForValue().set(key, JSON.toJSONString(vo), time, TimeUnit.SECONDS);
+            } finally {
                 lock.unlock();
             }
         }
@@ -303,9 +303,9 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     @Override
     public void mintNft(NftBatchInfoEntity batchInfoEntity) {
         Integer isOpen = batchInfoEntity.getIsOpen();
-        if(isOpen == 1){
+        if (isOpen == 1) {
             batchInfoEntity.setLanuchStatus(1);
-        }else {
+        } else {
             batchInfoEntity.setLanuchStatus(0);
         }
         this.save(batchInfoEntity);
@@ -315,8 +315,5 @@ public class NftBatchInfoServiceImpl extends ServiceImpl<NftBatchInfoMapper, Nft
     @Override
     public void updateInventory(Long artId, Long localId) {
         batchInfoMapper.updateInventory(artId);
-
     }
-
-
 }

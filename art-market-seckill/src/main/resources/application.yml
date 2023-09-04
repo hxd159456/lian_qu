@@ -2,22 +2,30 @@ server:
   port: 9020
 
 spring:
+  cloud:
+    sentinel:
+      transport:
+        port: 8080 #与sentinel-dashboard通信端口，如果被占用，会自动向后扫描
+        dashboard: 127.0.0.1:8080 #sentinel-dashboard地址
+    nacos:
+      discovery:
+        server-addr: 10.16.19.243:8848
   session:
     store-type: redis
   application:
     name: art-market-seckill
   redis:
-    host: 124.71.223.148
+    host: 10.16.19.243
     port: 6379
 
   rabbitmq:
-    host: 124.71.223.148
+    host: 10.16.19.243
     port: 5672
     virtual-host: /
     username: guest
     password: guest
     #开启发送端确认、确认被mq服务器交换机接收
-    publisher-confirms: true
+    publisher-confirm-type: correlated
     #开启发送端消息抵达队列的确认、确认被路由到队列
     publisher-returns: true
     #只要抵达队列，以异步方式优先回调returnConfirm

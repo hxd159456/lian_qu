@@ -1,4 +1,8 @@
+server:
+  port: 8881
 spring:
+  application:
+    name: art-dev-author
   cache:
     cache-names: nftInfo
     type: redis
@@ -6,8 +10,8 @@ spring:
     store-type: redis
   datasource:
     username: root
-    password: Hxd159753@
-    url: jdbc:mysql://localhost:3306/art?useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+    password: Ye500235!
+    url: jdbc:mysql://10.16.19.243:3306/art_dev?useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
     dirver-class-name: com.mysql.jdbc.Driver
     hikari:
       max-lifetime: 120000
@@ -15,9 +19,9 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.1.6:8848
+        server-addr: 10.16.19.243:8848
   redis:
-    host: 127.0.0.1
+    host: 10.16.19.243
     port: 6379
   servlet:
     multipart:
@@ -26,7 +30,7 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   rabbitmq:
-    host: 124.71.223.148
+    host: 10.16.19.243
     port: 5672
     virtual-host: /
     username: guest

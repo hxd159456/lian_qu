@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
-@Configuration
+@Configuration("myWebConfig")
 @Slf4j
 public class WebConfig implements WebMvcConfigurer {
     @Override

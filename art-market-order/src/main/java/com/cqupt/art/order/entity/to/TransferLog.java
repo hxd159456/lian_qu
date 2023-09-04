@@ -1,8 +1,5 @@
 package com.cqupt.art.order.entity.to;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import jnr.ffi.annotations.In;
 import lombok.Data;
 
 import java.io.Serializable;

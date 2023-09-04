@@ -29,26 +29,29 @@ public class RabbitMqConfig {
     static class Converter {
         @Bean
         public MessageConverter messageConverter() {
-            //发送端和接收端的路径不一样，导致类转化失败，在接收端配置解决（也可在发送端解决）
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-            Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
-            converter.setClassMapper(new ClassMapper() {
-                @Override
-                public void fromClass(Class<?> aClass, MessageProperties messageProperties) {
-                    //发送端这么写
-//                     messageProperties.setHeader("__TypeId__","com.cqupt.art.order.entity.to.SeckillOrderTo");
-                    messageProperties.setHeader("__TypeId__","com.cqupt.art.chain.entity.to.ChainTransferTo.java");
-                }
-
-                @Override
-                public Class<?> toClass(MessageProperties messageProperties) {
-                    return SeckillOrderTo.class;
-                }
-            });
-            return converter;
+//            //发送端和接收端的路径不一样，导致类转化失败，在接收端配置解决（也可在发送端解决）
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//            Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
+//            converter.setClassMapper(new ClassMapper() {
+//                @Override
+//                public void fromClass(Class<?> aClass, MessageProperties messageProperties) {
+//                    //发送端这么写
+////                     messageProperties.setHeader("__TypeId__","com.cqupt.art.order.entity.to.SeckillOrderTo");
+//                    messageProperties.setHeader("__TypeId__","com.cqupt.art.chain.entity.to.ChainTransferTo.java");
+//                }
+//
+//                @Override
+//                public Class<?> toClass(MessageProperties messageProperties) {
+//                    return SeckillOrderTo.class;
+//                }
+//            });
+//            return converter;
+            return new Jackson2JsonMessageConverter();
         }
     }
+
+
 
     /**
      * 定制RabbitTemplate
@@ -91,4 +94,6 @@ public class RabbitMqConfig {
                     "==>replyText[" + replyText + "]==>exchange[" + exchange + "]==>routingKey[" + routingKey + "]");
         });
     }
+
+
 }

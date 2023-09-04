@@ -15,16 +15,16 @@ public interface TradeClient {
     @PostMapping("/transferLog")
     R saveTransferLog(@RequestBody TransferLog transferLog);
 
-    @GetMapping("/api/userToken/getUserToken")
-    public R getUserToken(@RequestParam("userId") String userId, @RequestParam("artId") String artId);
+    @GetMapping("/userToken/getUserToken")
+    public R getUserToken(@RequestParam("userId") String userId,@RequestParam("artId") String artId);
 
-    @PostMapping("/api/userToken/saveUserToken")
+    @PostMapping("userToken/saveUserToken")
     public R saveUserToken(@RequestBody UserToken userToken);
 
-    @PostMapping("/api/userToken/updateUserToken")
+    @PostMapping("/userToken/updateUserToken")
     public R updateUserToken(@RequestBody UserToken userToken);
 
-    @PostMapping("/api/userToken/saveUserTokenItem")
+    @PostMapping("/userToken/saveUserTokenItem")
     public R saveUserTokenItem(@RequestBody UserTokenItem item);
 
 }

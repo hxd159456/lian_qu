@@ -7,15 +7,18 @@ import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 @RestController
 @Slf4j
 public class TestController {
+    int serverId = 2;
 
     @GetMapping("/user/test")
     public R test() {
@@ -26,6 +29,11 @@ public class TestController {
     @GetMapping("/test/v6")
     public R testV6(){
         return R.ok().put("msg","Hello Ipv6");
+    }
+
+    @GetMapping("/test/lb")
+    public R testLb(){
+        return R.ok().put("serverId",2);
     }
 
     @GetMapping("/test/setCookie")

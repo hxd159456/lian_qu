@@ -1,81 +1,65 @@
 spring:
+  main:
+    web-application-type: reactive
+  redis:
+    host: 10.16.19.243
+    port: 6379
+
   cloud:
     gateway:
       routes:
-        - id: product_route
-          uri: lb://gulimall-product
-          predicates:
-            - Path=/api/product/**,/hello
-          filters:
-            - RewritePath=/api/(?<segment>.*),/$\{segment}
-
-        - id: third_party_route
-          uri: lb://gulimall-third-party
-          predicates:
-            - Path=/api/thirdparty/**
-          filters:
-            - RewritePath=/api/thirdparty/(?<segment>/?.*),/$\{segment}
-
-        - id: member_route
-          uri: lb://gulimall-member
-          predicates:
-            - Path=/api/member/**
-          filters:
-            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
-
         - id: author_route
-          uri: lb://artdev-author
+          uri: lb://art-dev-author
           predicates:
-            - Path=/api/author/**
+            - Path=/api/author/**,/hello
           filters:
-            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+            - RewritePath=/api/author/(?<segment>.*),/author/$\{segment}
 
-        - id: ware_route
-          uri: lb://gulimall-ware
+        - id: notice_route
+          uri: lb://art-market-notice
           predicates:
-            - Path=/api/ware/**
+            - Path=/api/notice/**
           filters:
-            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+            - RewritePath=/api/notice/(?<segment>/?.*),/$\{segment}
 
-        - id: admin_route
-          uri: lb://renren-fast
+        - id: order_route
+          uri: lb://art-order-server
           predicates:
-            - Path=/api/**
+            - Path=/api/order/**
           filters:
-            - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+            - RewritePath=/api/order/(?<segment>/?.*),/$\{segment}
 
-        - id: gulimall_host_route
-          uri: lb://gulimall-product
+        - id: sms_route
+          uri: lb://art-market-sms
           predicates:
-            - Host=gulimall.com,item.gulimall.com
+            - Path=/api/sms/**
+          filters:
+            - RewritePath=/api/sms/(?<segment>/?.*),/$\{segment}
 
-        - id: gulimall_search_route
-          uri: lb://gulimall-search
+        - id: seckill_route
+          uri: lb://art-market-seckill
           predicates:
-            - Host=search.gulimall.com
+            - Path=/app/seckill/**
+          filters:
+            - RewritePath=/app/seckill/(?<segment>/?.*),/$\{segment}
+#            - name: RequestRateLimiter
+#              args:
+#                redis-rate-limiter.replenishRate: 3
+#                redis-rate-limiter.burstCapacity: 2000
+#                key-resolver: "#{@userKeyResolver}"
 
-        - id: gulimall_auth_route
-          uri: lb://gulimall-auth-server
+
+        - id: trade_route
+          uri: lb://art-market-trade
           predicates:
-            - Host=auth.gulimall.com
+            - Path=/api/trade/**
+          filters:
+            - RewritePath=/api/trade/(?<segment>/?.*),/$\{segment}
 
-        - id: gulimall_cart_route
-          uri: lb://gulimall-cart
-          predicates:
-            - Host=cart.gulimall.com
-
-        - id: gulimall_order_route
-          uri: lb://gulimall-order
-          predicates:
-            - Host=order.gulimall.com
-
-        - id: gulimall_member_route
-          uri: lb://gulimall-member
-          predicates:
-            - Host=member.gulimall.com
-
-        - id: art_market_user_route
+        - id: memeber_route
           uri: lb://art-user-service
           predicates:
-            - Host=user.art-market.com
+            - Path=/api/user/**
+          filters:
+            - RewritePath=/api/user(?<segment>.*),/$\{segment}
 

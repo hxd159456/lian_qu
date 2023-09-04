@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@Component
+//@Component
 public class MybatisDateConfig implements MetaObjectHandler {
     /**
      * 使用mp做添加操作时候，这个方法执行

@@ -1,0 +1,6 @@
+#seata:
+#  application-id: seata-server
+#  tx-service-group: fsp_tx_group # Seata 事务组, 值为seata-server的file.conf中vgroupMapping后面跟的值，此处为fsp_tx_group
+#  client:
+#    support:
+#      spring

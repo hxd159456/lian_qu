@@ -11,6 +11,8 @@ import com.cqupt.art.service.UserService;
 import com.cqupt.art.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +27,6 @@ import java.util.List;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/api/user")
 @Slf4j
 public class UserController {
     @Autowired
@@ -114,5 +115,14 @@ public class UserController {
         }else{
             return R.error("不合法的转入用户！");
         }
+    }
+
+    @GetMapping("/userId/{chainAdder}")
+    public R getUserId(@PathVariable String chainAdder){
+        User one = userService.getOne(new QueryWrapper<User>().eq("chain_address", chainAdder));
+        if(one!=null){
+            return R.ok().put("userId",one.getUserId());
+        }
+        return R.error();
     }
 }

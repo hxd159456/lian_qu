@@ -16,6 +16,4 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserTokenService extends IService<UserToken> {
 
-//    List<TokenBasicVo> userToken(String userId, Integer curPage, Integer limit);
-
 }

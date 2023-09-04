@@ -117,7 +117,9 @@ public class SmssServiceImpl implements SmsService {
             smsLog.setSmsCode(verificationCode);
             //设置10分钟有效
             //key hashKey value
-            redisTemplate.opsForValue().set(SMS_CODE_PREFIX + phone, verificationCode, 10, TimeUnit.MINUTES);
+            redisTemplate
+                    .opsForValue()
+                    .set(SMS_CODE_PREFIX + phone, verificationCode, 10, TimeUnit.MINUTES);
 //            redisTemplate.expire(SMS_CODE_PREFIX+":-"+phone,10,TimeUnit.MINUTES);
             String[] templateParamSet = {verificationCode};
             String content = "【踩坑指北公众号】您的动态验证码为：" + verificationCode + "，您正在进行密码重置操作，如非本人操作，请忽略本短信！";

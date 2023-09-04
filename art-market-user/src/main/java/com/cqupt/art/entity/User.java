@@ -17,14 +17,12 @@ import java.util.Date;
  * <p>
  * 用户表
  * </p>
- *
  * @author huangxudong
  * @since 2022-11-03
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-//@ApiModel(value="PmUser对象", description="用户表")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;

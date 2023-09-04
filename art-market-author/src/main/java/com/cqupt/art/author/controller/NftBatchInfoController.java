@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/author/nftBatchInfo")
+@RequestMapping("author/nftBatchInfo")
 @CrossOrigin
 @Slf4j
 public class NftBatchInfoController {
@@ -61,7 +61,10 @@ public class NftBatchInfoController {
         nftBatchInfoService.mintNft(batchInfoEntity);
 //        nftBatchInfoService.save(batchInfoEntity);
         //todo 这里应该去处理上链的逻辑了
-        rabbitTemplate.convertAndSend(MyNftMqConfig.MINT_EXCHANGE, MyNftMqConfig.MINT_PRODUCT_ROUTING_KEY, batchInfoEntity);
+        rabbitTemplate.convertAndSend(
+                MyNftMqConfig.MINT_EXCHANGE,
+                MyNftMqConfig.MINT_PRODUCT_ROUTING_KEY,
+                batchInfoEntity);
         return R.ok().put("data", batchInfoEntity);
     }
 

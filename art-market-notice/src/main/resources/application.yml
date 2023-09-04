@@ -3,15 +3,21 @@ spring:
     name: art-market-notice
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/art?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.16.19.243:3306/art_dev?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
-    password: Hxd159753@
+    password: Ye500235!
     hikari:
       max-lifetime: 120000
+  redis:
+    host: 10.16.19.243
+    port: 6379
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.16.19.243:8848
 
 server:
   port: 8890
-
 
 mybatis-plus:
   configuration:

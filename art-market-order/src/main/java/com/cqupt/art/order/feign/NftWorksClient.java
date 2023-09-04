@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-@FeignClient(value = "art-market-author")
+@FeignClient(value = "art-dev-author")
 public interface NftWorksClient {
 
     @GetMapping("/author/nftBatchInfo/getNftName/{id}")
