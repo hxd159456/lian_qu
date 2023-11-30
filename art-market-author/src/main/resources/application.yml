@@ -11,7 +11,7 @@ spring:
   datasource:
     username: root
     password: Ye500235!
-    url: jdbc:mysql://10.16.19.243:3306/art_dev?useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+    url: jdbc:mysql://10.16.64.250:3306/art_dev?useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
     dirver-class-name: com.mysql.jdbc.Driver
     hikari:
       max-lifetime: 120000
@@ -19,9 +19,9 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 10.16.19.243:8848
+        server-addr: 10.16.64.250:8848
   redis:
-    host: 10.16.19.243
+    host: 10.16.64.250
     port: 6379
   servlet:
     multipart:
@@ -30,7 +30,7 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   rabbitmq:
-    host: 10.16.19.243
+    host: 10.16.64.250
     port: 5672
     virtual-host: /
     username: guest

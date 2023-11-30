@@ -2,7 +2,7 @@ spring:
   main:
     web-application-type: reactive
   redis:
-    host: 10.16.19.243
+    host: 10.16.64.250
     port: 6379
 
   cloud:
