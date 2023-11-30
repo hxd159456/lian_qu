@@ -26,7 +26,6 @@ public class NftInfoController {
 
     /**
      * 查询全部的藏品并分页
-     *
      * @param params
      * @return 所需那一页的集合，以及这个集合的个数，可以通过以下参数查询
      * 1、artName 藏品名字

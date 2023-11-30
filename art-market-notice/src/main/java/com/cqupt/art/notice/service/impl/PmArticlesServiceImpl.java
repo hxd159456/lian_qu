@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +32,7 @@ public class PmArticlesServiceImpl extends ServiceImpl<PmArticlesMapper, PmArtic
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
-    @Autowired
+    @Resource
     RedisTemplate<String,PmArticles> redisTemplate;
 
     @Autowired
