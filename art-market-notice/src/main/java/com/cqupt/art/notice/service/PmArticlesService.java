@@ -3,6 +3,8 @@ package com.cqupt.art.notice.service;
 import com.cqupt.art.notice.entity.PmArticles;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 文章记录表 服务类
@@ -17,4 +19,7 @@ public interface PmArticlesService extends IService<PmArticles> {
     PmArticles getNoticeDetail(String articleId);
 
     void updateArticle(PmArticles article);
+
+    List<PmArticles> shouldCached();
+
 }

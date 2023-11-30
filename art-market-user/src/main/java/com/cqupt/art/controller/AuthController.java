@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @RestController
 @Slf4j
@@ -24,11 +25,12 @@ import java.util.Map;
 public class AuthController {
     @Autowired
     UserService userService;
-
+    
     private ThreadLocal<User> threadLocal;
 
     @PostMapping("/register")
     public R register(@RequestBody @Valid UserRegisterVo registerVo, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(item -> {
@@ -51,7 +53,10 @@ public class AuthController {
         }
         User user = userService.login(userLoginVo);
         if (user != null) {
-            session.setAttribute("loginUser", user);
+            String id = session.getId();
+            response.setHeader("token",id);
+
+//            session.setAttribute("loginUser", user);
             LoginUserVo vo = new LoginUserVo();
             vo.setId(user.getUserId());
             vo.setChainAddress(user.getChainAddress());

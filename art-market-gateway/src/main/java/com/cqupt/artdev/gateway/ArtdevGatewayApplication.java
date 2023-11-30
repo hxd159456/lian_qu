@@ -19,6 +19,4 @@ public class ArtdevGatewayApplication {
     public static void main(String[] args) {
         SpringApplication.run(ArtdevGatewayApplication.class, args);
     }
-
-
 }

@@ -42,7 +42,6 @@ public class AccessLimitIntercptor implements HandlerInterceptor {
                 Object o = request.getSession().getAttribute("loginUser");
                 if(o!=null){
                     User loginUser = JSON.parseObject(o.toString(),User.class);
-
                     String userId = loginUser.getUserId();
                     //限制访问的前缀+用户id+请求路径
                     String lockKey = ACCESSLIMIT_LOCK_PREFIX+userId+request.getRequestURI();

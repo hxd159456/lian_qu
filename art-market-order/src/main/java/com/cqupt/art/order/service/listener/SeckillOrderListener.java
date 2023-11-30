@@ -28,7 +28,8 @@ public class SeckillOrderListener {
     OrderService orderService;
 
     private final int retryLimit = 3;
-    
+
+    // 订单消息，创建订单
     @RabbitListener(queues = SeckillOrderMqConstant.SECKILL_CREATE_ORDER_QUEUE)
     @RabbitHandler
     @SneakyThrows
@@ -60,7 +61,8 @@ public class SeckillOrderListener {
                     channel.basicAck(tag,false);
                     //保存消息
                     redisTemplate.opsForValue()
-                            .setIfAbsent("seckill:create-order:fail:"+orderTo.getOrderSn(),JSON.toJSONString(orderTo));
+                            .setIfAbsent("seckill:create-order:fail:"+orderTo.getOrderSn(),
+                                    JSON.toJSONString(orderTo));
                     // 通知开发者
                     // sendMailToDeveloper();
                 }

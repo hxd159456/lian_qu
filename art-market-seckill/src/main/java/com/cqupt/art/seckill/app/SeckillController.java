@@ -7,10 +7,12 @@ import com.cqupt.art.seckill.entity.vo.SeckillInfoVo;
 import com.cqupt.art.seckill.service.SeckillService;
 import com.cqupt.art.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.annotation.PostConstruct;
 
 @RestController
 @CrossOrigin
@@ -29,7 +31,7 @@ public class SeckillController {
     @SentinelResource(value = "seckill", blockHandler = "handleSecBlock")
     @PostMapping("/nft")
     //单用户访问频率控制
-//    @AccessLimit(maxTime = 2L)
+    @AccessLimit(maxTime = 2L)
     public R seckill(@RequestBody SeckillInfoVo info) throws InterruptedException {
         String orderSn = seckillService.kill(info);
         if (orderSn != null) {

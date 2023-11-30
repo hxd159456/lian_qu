@@ -4,8 +4,6 @@ import com.alibaba.fastjson2.JSON;
 import com.cqupt.art.constant.SeckillConstant;
 import com.cqupt.art.constant.SeckillOrderMqConstant;
 import com.cqupt.art.exception.RRException;
-import com.cqupt.art.seckill.config.LoginInterceptor;
-import com.cqupt.art.seckill.entity.User;
 import com.cqupt.art.seckill.entity.to.NftDetailRedisTo;
 import com.cqupt.art.seckill.entity.to.SeckillOrderTo;
 import com.cqupt.art.seckill.entity.vo.SeckillInfoVo;
@@ -13,17 +11,25 @@ import com.cqupt.art.seckill.service.SeckillService;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SeckillServiceImpl implements SeckillService {
 
+    @Resource
     @Autowired
     RedissonClient redissonClient;
     @Autowired
@@ -50,6 +57,33 @@ public class SeckillServiceImpl implements SeckillService {
 
     RateLimiter rateLimiter = RateLimiter.create(500);
 
+    final private static String key_prefix = "nft:seckill:info:detail:";
+
+    @PostConstruct
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void init() {
+        Thread thread = new Thread(() -> {
+            while (true) {
+                Set<String> keys = redisTemplate.keys(key_prefix.concat("*"));
+                if (keys != null && keys.size() > 0) {
+                    List<String> seckillInfoList = redisTemplate.opsForValue().multiGet(keys);
+                    assert seckillInfoList != null;
+                    for (String infoJSON : seckillInfoList) {
+                        log.info("缓存物品：{}", infoJSON);
+                    }
+                }
+                try {
+                    TimeUnit.SECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+//        thread.setDaemon(true);
+        thread.start();
+    }
+
+
     @Override
     public String kill(SeckillInfoVo info) throws InterruptedException {
 //        //令牌桶限流
@@ -62,12 +96,12 @@ public class SeckillServiceImpl implements SeckillService {
 //        if (seckillLocalCache.containsKey(localCacheKey)) {
 //            to = seckillLocalCache.get(localCacheKey);
 //        } else {
-            String jsonString = redisTemplate.opsForValue().get("nft:seckill:info:detail:" + info.getName() + "-" + info.getId());
+        String jsonString = redisTemplate.opsForValue().get("nft:seckill:info:detail:" + info.getName() + "-" + info.getId());
 //            String jsonString = ops.get(info.getName() + "-" + info.getId());
-            if (StringUtils.isNotBlank(jsonString)) {
-                to = JSON.parseObject(jsonString, NftDetailRedisTo.class);
-                seckillLocalCache.put(localCacheKey, to);
-            }
+        if (StringUtils.isNotBlank(jsonString)) {
+            to = JSON.parseObject(jsonString, NftDetailRedisTo.class);
+            seckillLocalCache.put(localCacheKey, to);
+        }
 //        }
         if (to != null) {
             String token = info.getToken();
@@ -108,6 +142,7 @@ public class SeckillServiceImpl implements SeckillService {
 //                                rabbitTemplate.convertAndSend(SeckillOrderMqConstant.EXCHANGE,
 //                                        SeckillOrderMqConstant.ROUTING_KEY, orderTo);
 //                            });
+
                             sendOrderMeassage(orderTo);
                             return orderSn;
                         }
@@ -124,13 +159,17 @@ public class SeckillServiceImpl implements SeckillService {
     // 通常采用消息确认机制  confirmCallBack ——> 投递到exchange触发，ack或nack
     // returnCallback   ——> 投递到queue失败触发
     // 解决方案：业务重发！发送时保存消息（或者用数据库字段标识），失败回调进行重发。
-    private void sendOrderMeassage(SeckillOrderTo orderTo){
-        redisTemplate.opsForValue().set(SeckillOrderMqConstant.REDIS_SECKILL_ORDER_MESSAGE_PREFIX+orderTo.getOrderSn(),JSON.toJSONString(orderTo));
+    private void sendOrderMeassage(SeckillOrderTo orderTo) {
+
+        redisTemplate.opsForValue()
+                .set(SeckillOrderMqConstant.REDIS_SECKILL_ORDER_MESSAGE_PREFIX + orderTo.getOrderSn(),
+                        JSON.toJSONString(orderTo),
+                        1000);
         CorrelationData correlationData = new CorrelationData();
         correlationData.setId(orderTo.getOrderSn());
         threadPoolExecutor.execute(() -> {
             rabbitTemplate.convertAndSend(SeckillOrderMqConstant.SECKILL_ORDER_EXCHANGE,
-                    SeckillOrderMqConstant.CREATE_SECKILL_ORDER_ROUTING_KEY, orderTo,correlationData);
+                    SeckillOrderMqConstant.CREATE_SECKILL_ORDER_ROUTING_KEY, orderTo, correlationData);
         });
     }
 }

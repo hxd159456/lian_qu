@@ -4,6 +4,8 @@ import com.cqupt.art.notice.entity.PmArticles;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 文章记录表 Mapper 接口
@@ -14,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface PmArticlesMapper extends BaseMapper<PmArticles> {
+
+    List<PmArticles> shouldCached();
 
 }

@@ -2,4 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cqupt.art.notice.mapper.PmArticlesMapper">
 
+    <select id="shouldCached" resultType="com.cqupt.art.notice.entity.PmArticles">
+        select * from pm_articles
+        where DATE_SUB(CURDATE(),INTERVAL 2 DAY) <= date(publish_time) and status = 1;
+    </select>
 </mapper>

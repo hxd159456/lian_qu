@@ -32,16 +32,16 @@ public class RabbitMqConfig {
 
 
     @PostConstruct
-    public void initRabbitTemplate(){
+    public void initRabbitTemplate() {
         rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
             // 消息ID需要封装到CorrelationData
             @Override
             public void confirm(CorrelationData correlationData, boolean ack, String s) {
-                log.info("投递到exchange回调.{}",correlationData);
-                if(ack){
+                log.info("投递到exchange回调.{}", correlationData);
+                if (ack) {
                     // 成功投递，删除缓存
-                    redisTemplate.delete(SeckillOrderMqConstant.REDIS_SECKILL_ORDER_MESSAGE_PREFIX+correlationData.getId());
-                }else{
+                    redisTemplate.delete(SeckillOrderMqConstant.REDIS_SECKILL_ORDER_MESSAGE_PREFIX + correlationData.getId());
+                } else {
                     // 没有成功投递，重试
                     String msg = redisTemplate.opsForValue().get(SeckillOrderMqConstant.REDIS_SECKILL_ORDER_MESSAGE_PREFIX + correlationData.getId());
                     rabbitTemplate.convertAndSend(SeckillOrderMqConstant.SECKILL_ORDER_EXCHANGE,
@@ -56,8 +56,8 @@ public class RabbitMqConfig {
             public void returnedMessage(Message message, int i, String s, String s1, String s2) {
                 // 是可以拿到消息信息的
 //                Body:'{"orderSn":"41f71ebdab2f4eacada6ec4811d12964","buyUserId":"777","goodsId":"888","price":19.8999996185302734375,"token":"sss1234"}'
-                log.info("消息体：{},properties:{}",message.getBody(),message.getMessageProperties());
-                log.info("消息投递到队列失败：message:{},i:{},s:{},s1:{},s2:{}",message,i,s,s1,s2);
+                log.info("消息体：{},properties:{}", message.getBody(), message.getMessageProperties());
+                log.info("消息投递到队列失败：message:{},i:{},s:{},s1:{},s2:{}", message, i, s, s1, s2);
             }
         });
     }

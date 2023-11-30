@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cqupt.art.order.entity.to.SeckillOrderTo;
 import com.cqupt.art.order.entity.vo.AlipayAsyncVo;
 import com.cqupt.art.order.entity.vo.PayVo;
+import io.seata.rm.tcc.api.LocalTCC;
+import io.seata.rm.tcc.api.TwoPhaseBusinessAction;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
  * @since 2022-11-22
  */
 @Service
+@LocalTCC
 public interface OrderService extends IService<Order> {
 
     void createSeckillOrder(SeckillOrderTo orderTo);
@@ -23,6 +26,7 @@ public interface OrderService extends IService<Order> {
     PayVo getOrderPay(String orderSn,String goodsId,String name);
 
     boolean handlerPayResult(AlipayAsyncVo alipayAsyncVo);
+
 
     void releaseOrder(String msg);
 

@@ -52,7 +52,10 @@ public class AlipayTemplate {
 
     public String pay(PayVo vo) throws AlipayApiException {
         log.info("开始处理支付......");
-        AlipayClient aliPayClient = new DefaultAlipayClient(gatewayUrl, app_id, merchant_private_key, "json", charset, alipay_public_key, sign_type);
+        AlipayClient aliPayClient =
+                new DefaultAlipayClient(gatewayUrl,
+                        app_id,
+                        merchant_private_key, "json", charset, alipay_public_key, sign_type);
 
         AlipayTradeWapPayRequest payRequest = new AlipayTradeWapPayRequest();
 
