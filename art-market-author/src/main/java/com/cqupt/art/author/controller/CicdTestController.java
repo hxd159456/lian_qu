@@ -11,4 +11,9 @@ public class CicdTestController {
     public R version(){
         return R.ok().put("version",1.0);
     }
+
+    @GetMapping("/hello")
+    public R hello(){
+        return R.ok("HelloWorld");
+    }
 }
