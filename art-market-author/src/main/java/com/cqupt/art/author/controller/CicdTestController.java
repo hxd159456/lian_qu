@@ -16,4 +16,9 @@ public class CicdTestController {
     public R hello(){
         return R.ok("HelloWorld");
     }
+
+    @GetMapping("/newApi")
+    public R newApi(){
+        return R.ok("cicd demo!");
+    }
 }
